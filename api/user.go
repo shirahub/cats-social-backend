@@ -1,7 +1,7 @@
-package handler
+package api
 
 import (
-	"app/database"
+	"app/repository"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
 
@@ -50,7 +50,7 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't hash password", "errors": err.Error()})
 	}
 
-	_, err = database.DB.Exec("INSERT INTO users (email, name, password) VALUES ($1, $2, $3)", user.Email, user.Name, hash)
+	_, err = repository.DB.Exec("INSERT INTO users (email, name, password) VALUES ($1, $2, $3)", user.Email, user.Name, hash)
 	if err != nil {
 		log.Error(err)
 	}

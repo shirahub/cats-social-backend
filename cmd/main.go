@@ -1,8 +1,8 @@
 package main
 
 import (
-	"app/database"
-	"app/router"
+	"app/repository"
+	"app/api"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,8 +19,8 @@ func main() {
 	})
 	// app.Use(cors.New())
 
-	database.ConnectDB()
+	repository.ConnectDB()
 
-	router.SetupRoutes(app)
+	api.SetupRoutes(app)
 	log.Fatal(app.Listen(":8080"))
 }

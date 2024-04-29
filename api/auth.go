@@ -1,8 +1,8 @@
-package handler
+package api
 
 import (
 	"app/config"
-	"app/model"
+	"app/domain"
 	"log"
 	"net/mail"
 	"time"
@@ -19,11 +19,11 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func getUserByEmail(e string) (*model.User, error) {
+func getUserByEmail(e string) (*domain.User, error) {
 	// TODO
-	//db := database.DB
-	//var user model.User
-	//if err := db.Where(&model.User{Email: e}).First(&user).Error; err != nil {
+	//db := repository.DB
+	//var user domain.User
+	//if err := db.Where(&domain.User{Email: e}).First(&user).Error; err != nil {
 	//	if errors.Is(err, gorm.ErrRecordNotFound) {
 	//		return nil, nil
 	//	}
@@ -33,12 +33,12 @@ func getUserByEmail(e string) (*model.User, error) {
 	return nil, nil
 }
 
-func getUserByUsername(u string) (*model.User, error) {
+func getUserByUsername(u string) (*domain.User, error) {
 	// TODO
 
-	//db := database.DB
-	//var user model.User
-	//if err := db.Where(&model.User{Username: u}).First(&user).Error; err != nil {
+	//db := repository.DB
+	//var user domain.User
+	//if err := db.Where(&domain.User{Username: u}).First(&user).Error; err != nil {
 	//	if errors.Is(err, gorm.ErrRecordNotFound) {
 	//		return nil, nil
 	//	}
@@ -75,25 +75,25 @@ func Login(c *fiber.Ctx) error {
 
 	identity := input.Identity
 	pass := input.Password
-	userModel, err := new(model.User), *new(error)
+	userdomain, err := new(domain.User), *new(error)
 
 	if valid(identity) {
-		userModel, err = getUserByEmail(identity)
+		userdomain, err = getUserByEmail(identity)
 	} else {
-		userModel, err = getUserByUsername(identity)
+		userdomain, err = getUserByUsername(identity)
 	}
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Internal Server Error", "data": err})
-	} else if userModel == nil {
+	} else if userdomain == nil {
 		CheckPasswordHash(pass, "")
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Invalid identity or password", "data": err})
 	} else {
 		ud = UserData{
-			ID:       userModel.ID,
-			//Username: userModel.Username,
-			Email:    userModel.Email,
-			Password: userModel.Password,
+			ID:       userdomain.ID,
+			//Username: userdomain.Username,
+			Email:    userdomain.Email,
+			Password: userdomain.Password,
 		}
 	}
 

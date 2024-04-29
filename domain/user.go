@@ -1,4 +1,4 @@
-package model
+package domain
 
 // User struct
 type User struct {
