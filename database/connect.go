@@ -17,7 +17,7 @@ func ConnectDB() {
 		panic("failed to parse database port")
 	}
 
-	db, err = sql.Open("postgres",
+	DB, err = sql.Open("postgres",
 		fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s %s",
 			config.Config("DB_HOST"),
 			port,
@@ -31,7 +31,7 @@ func ConnectDB() {
 		panic("failed to open db")
 	}
 
-	if err = db.Ping(); err != nil {
+	if err = DB.Ping(); err != nil {
 		panic("failed to ping db")
 	}
 }

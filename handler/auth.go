@@ -62,7 +62,7 @@ func Login(c *fiber.Ctx) error {
 	}
 	type UserData struct {
 		ID       uint   `json:"id"`
-		Username string `json:"username"`
+		//Username string `json:"username"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
@@ -91,7 +91,7 @@ func Login(c *fiber.Ctx) error {
 	} else {
 		ud = UserData{
 			ID:       userModel.ID,
-			Username: userModel.Username,
+			//Username: userModel.Username,
 			Email:    userModel.Email,
 			Password: userModel.Password,
 		}
@@ -104,7 +104,7 @@ func Login(c *fiber.Ctx) error {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["username"] = ud.Username
+	//claims["username"] = ud.Username
 	claims["user_id"] = ud.ID
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
