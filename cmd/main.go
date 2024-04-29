@@ -19,8 +19,11 @@ func main() {
 	})
 	// app.Use(cors.New())
 
-	repository.ConnectDB()
+	dbConn := repository.NewPostgresConnection()
+	userRepo := repository.NewUserRepo(dbConn)
 
-	api.SetupRoutes(app)
+	router := api.NewRouter(api.NewUserHandler(userRepo))
+
+	router.Setup(app)
 	log.Fatal(app.Listen(":8080"))
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"app/domain"
 	"app/repository"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
@@ -10,6 +11,14 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2/log"
 )
+
+type userHandler struct {
+	repo *repository.UserRepo
+}
+
+func NewUserHandler(repo *repository.UserRepo) *userHandler {
+	return &userHandler{repo}
+}
 
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -34,7 +43,7 @@ type registerRequest struct {
 	Password string `validate:"min=5,max=15"`
 }
 
-func Register(c *fiber.Ctx) error {
+func (h *userHandler) Register(c *fiber.Ctx) error {
 	user := new(registerRequest)
 	if err := c.BodyParser(user); err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "errors": err.Error()})
@@ -50,7 +59,7 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't hash password", "errors": err.Error()})
 	}
 
-	_, err = repository.DB.Exec("INSERT INTO users (email, name, password) VALUES ($1, $2, $3)", user.Email, user.Name, hash)
+	err = h.repo.Create(domain.User{Email: user.Email, Name: user.Name, Password: hash})
 	if err != nil {
 		log.Error(err)
 	}

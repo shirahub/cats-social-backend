@@ -9,15 +9,14 @@ import (
 	"strconv"
 )
 
-// ConnectDB connect to db
-func ConnectDB() {
+func NewPostgresConnection() *sql.DB {
 	p := config.Config("DB_PORT")
 	port, err := strconv.ParseUint(p, 10, 32)
 	if err != nil {
 		panic("failed to parse database port")
 	}
 
-	DB, err = sql.Open("postgres",
+	db, err := sql.Open("postgres",
 		fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s %s",
 			config.Config("DB_HOST"),
 			port,
@@ -31,7 +30,9 @@ func ConnectDB() {
 		panic("failed to open db")
 	}
 
-	if err = DB.Ping(); err != nil {
+	if err = db.Ping(); err != nil {
 		panic("failed to ping db")
 	}
+
+	return db
 }
