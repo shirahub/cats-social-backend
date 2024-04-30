@@ -7,11 +7,13 @@ import (
 
 type router struct {
 	*userHandler
+	*catManagementHandler
 }
 
-func NewRouter(userHandler *userHandler) *router {
+func NewRouter(userHandler *userHandler, catMgtHandler *catManagementHandler) *router {
 	return &router{
 		userHandler: userHandler,
+		catManagementHandler: catMgtHandler,
 	}
 }
 
@@ -25,4 +27,9 @@ func (r *router) Setup(app *fiber.App) {
 	user.Post("/register", r.userHandler.Register)
 	user.Post("/login", r.userHandler.Login)
 
+	catManagement := api.Group("/cat")
+	catManagement.Post("", r.catManagementHandler.Create)
+	catManagement.Get("", r.catManagementHandler.List)
+	catManagement.Put("/:id", r.catManagementHandler.Update)
+	catManagement.Delete("/:id", r.catManagementHandler.Delete)
 }

@@ -20,9 +20,14 @@ func main() {
 	// app.Use(cors.New())
 
 	dbConn := repository.NewPostgresConnection()
-	userRepo := repository.NewUserRepo(dbConn)
 
-	router := api.NewRouter(api.NewUserHandler(userRepo))
+	userRepo := repository.NewUserRepo(dbConn)
+	catRepo := repository.NewCatRepo(dbConn)
+
+	userHandler := api.NewUserHandler(userRepo)
+	catMgtHandler := api.NewCatManagementHandler(catRepo)
+
+	router := api.NewRouter(userHandler, catMgtHandler)
 
 	router.Setup(app)
 	log.Fatal(app.Listen(":8080"))
