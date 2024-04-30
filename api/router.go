@@ -23,6 +23,6 @@ func (r *router) Setup(app *fiber.App) {
 	// User
 	user := api.Group("/user")
 	user.Post("/register", r.userHandler.Register)
-	user.Post("/login", Login)
+	user.Post("/login", r.userHandler.Login)
 
 }
