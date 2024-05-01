@@ -21,11 +21,30 @@ const createMatchQuery = `
 	RETURNING id, created_at
 `
 
-const getMatchByIdUserIdQuery = `
+const getIssuedByIdUserIdQuery = `
 	SELECT cat_matches.id, message, issuer_cat_id, receiver_cat_id, status, cat_matches.created_at
 	FROM cat_matches
 	INNER JOIN cats ON cat_matches.issuer_cat_id = cats.id
 	WHERE cat_matches.id = $1 AND user_id = $2 AND cat_matches.deleted_at is null
+`
+
+const getReceivedByIdUserIdQuery = `
+	SELECT cat_matches.id, message, issuer_cat_id, receiver_cat_id, status, cat_matches.created_at
+	FROM cat_matches
+	INNER JOIN cats ON cat_matches.receiver_cat_id = cats.id
+	WHERE cat_matches.id = $1 AND user_id = $2 AND cat_matches.deleted_at is null
+`
+
+const updateStatusMatchQuery = `
+	UPDATE cat_matches
+	SET status = $1
+	FROM cats
+	WHERE user_id = $2
+	AND receiver_cat_id = cats.id
+	AND cat_matches.id = $3
+	AND status = 'pending'
+	AND cat_matches.deleted_at is null
+	RETURNING cat_matches.id, cat_matches.updated_at
 `
 
 const updateDeletedAtMatchQuery = `
@@ -47,16 +66,38 @@ func (r *CatMatchRepo) Create(match *domain.CatMatch) (*domain.CatMatch, error) 
 	return match, err
 }
 
-func (r *CatMatchRepo) GetByIdUserId(matchId string, userId string) (*domain.CatMatch, error) {
+func (r *CatMatchRepo) GetIssuedByIdUserId(matchId string, userId string) (*domain.CatMatch, error) {
 	var match domain.CatMatch
 	err := r.db.QueryRow(
-		getMatchByIdUserIdQuery,
+		getIssuedByIdUserIdQuery,
 		matchId, userId,
 	).Scan(&match.Id, &match.Message, &match.IssuerCatId, &match.ReceiverCatId, &match.Status, &match.CreatedAt)
 	if err == sql.ErrNoRows {
 		return nil, domain.ErrNotFound
 	}
 	return &match, err
+}
+
+func (r *CatMatchRepo) GetReceivedByIdUserId(matchId string, userId string) (*domain.CatMatch, error) {
+	var match domain.CatMatch
+	err := r.db.QueryRow(
+		getReceivedByIdUserIdQuery,
+		matchId, userId,
+	).Scan(&match.Id, &match.Message, &match.IssuerCatId, &match.ReceiverCatId, &match.Status, &match.CreatedAt)
+	if err == sql.ErrNoRows {
+		return nil, domain.ErrNotFound
+	}
+	return &match, err
+}
+
+func (r *CatMatchRepo) UpdateStatus(matchId string, userId string, status string) (string, time.Time, error) {
+	var updatedMatchId string
+	var updatedAt time.Time
+	err := r.db.QueryRow(updateStatusMatchQuery, status, userId, matchId).Scan(&updatedMatchId, &updatedAt)
+	if err == sql.ErrNoRows {
+		return "", time.Time{}, domain.ErrNotFound
+	}
+	return updatedMatchId, updatedAt, err
 }
 
 func (r *CatMatchRepo) Delete(matchId string, userId string) (string, time.Time, error) {

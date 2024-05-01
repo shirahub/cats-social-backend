@@ -56,15 +56,65 @@ func (h *catMatchHandler) List(c *fiber.Ctx) error {
 	})
 }
 
+type updateMatchRequest struct {
+	MatchId string
+}
+
 func (h *catMatchHandler) Approve(c *fiber.Ctx) error {
+	req := new(updateMatchRequest)
+	if err := c.BodyParser(req); err != nil {
+		return failedToParseInput(c, err)
+	}
+
+	if err := validate.Struct(req); err != nil {
+		return invalidInput(c, err)
+	}
+
+	matchId, updatedAt, err := h.svc.Approve(req.MatchId, "1")
+	if err != nil {
+		if err == domain.ErrNotFound {
+			return serverError(c, fiber.StatusNotFound, "", err)
+		}
+		if err == domain.ErrMatchResponded {
+			return serverError(c, fiber.StatusBadRequest, "", err)
+		}
+		return serverError(c, fiber.StatusInternalServerError, "", err)
+	}
 	return c.JSON(fiber.Map{
 		"message": "success",
+		"data": fiber.Map{
+			"id":        matchId,
+			"updatedAt": updatedAt.Format(iso8601),
+		},
 	})
 }
 
 func (h *catMatchHandler) Reject(c *fiber.Ctx) error {
+	req := new(updateMatchRequest)
+	if err := c.BodyParser(req); err != nil {
+		return failedToParseInput(c, err)
+	}
+
+	if err := validate.Struct(req); err != nil {
+		return invalidInput(c, err)
+	}
+
+	matchId, updatedAt, err := h.svc.Reject(req.MatchId, "1")
+	if err != nil {
+		if err == domain.ErrNotFound {
+			return serverError(c, fiber.StatusNotFound, "", err)
+		}
+		if err == domain.ErrMatchResponded {
+			return serverError(c, fiber.StatusBadRequest, "", err)
+		}
+		return serverError(c, fiber.StatusInternalServerError, "", err)
+	}
 	return c.JSON(fiber.Map{
 		"message": "success",
+		"data": fiber.Map{
+			"id":        matchId,
+			"updatedAt": updatedAt.Format(iso8601),
+		},
 	})
 }
 
