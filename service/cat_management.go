@@ -26,6 +26,6 @@ func (h *catManagementSvc) Update(cat *domain.Cat) (*domain.Cat, error) {
 	return h.repo.Update(cat)
 }
 
-func (h *catManagementSvc) Delete(userId string, catId string) (string, time.Time, error) {
-	return h.repo.Delete(userId, catId)
+func (h *catManagementSvc) Delete(catId string, userId string) (string, time.Time, error) {
+	return h.repo.Delete(catId, userId)
 }

@@ -18,7 +18,7 @@ func (s *catMatchSvc) Create(catMatch *domain.CatMatch) (*domain.CatMatch, error
 	return s.repo.Create(catMatch)
 }
 
-func (s *catMatchSvc) Delete(userId string, catMatchId string) (string, time.Time, error) {
+func (s *catMatchSvc) Delete(catMatchId string, userId string) (string, time.Time, error) {
 	matchId, deletedAt, err := s.repo.Delete(userId, catMatchId)
 	if err == domain.ErrNotFound {
 		_, err = s.repo.GetByIdUserId(catMatchId, userId)

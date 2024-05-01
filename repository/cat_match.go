@@ -59,7 +59,7 @@ func (r *CatMatchRepo) GetByIdUserId(matchId string, userId string) (*domain.Cat
 	return &match, err
 }
 
-func (r *CatMatchRepo) Delete(userId string, matchId string) (string, time.Time, error) {
+func (r *CatMatchRepo) Delete(matchId string, userId string) (string, time.Time, error) {
 	var deletedMatchId string
 	var deletedAt time.Time
 	err := r.db.QueryRow(updateDeletedAtMatchQuery, userId, matchId).Scan(&deletedMatchId, &deletedAt)

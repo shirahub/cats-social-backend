@@ -151,7 +151,7 @@ func (r *CatRepo) Update(cat *domain.Cat) (*domain.Cat, error) {
 	return cat, err
 }
 
-func (r *CatRepo) Delete(userId string, catId string) (string, time.Time, error) {
+func (r *CatRepo) Delete(catId string, userId string) (string, time.Time, error) {
 	var deletedCatId string
 	var deletedAt time.Time
 	err := r.db.QueryRow(
