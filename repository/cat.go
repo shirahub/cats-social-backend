@@ -27,8 +27,9 @@ const getQuery = `
 	SELECT id, name, race, sex, age_in_month, description, image_urls, user_id, created_at
 	FROM cats
 	WHERE deleted_at is null
-	?
+	{{ where_query }}
 	ORDER BY created_at DESC
+	{{ pagination_query }}
 `
 
 const updateQuery = `
@@ -64,25 +65,38 @@ func (r *CatRepo) Create(cat *domain.CreateCatRequest) (*domain.Cat, error) {
 }
 
 func formGetQuery(req *domain.GetCatsRequest) (string, []interface{}) {
-	var query strings.Builder
+	var whereQuery, paginationQuery strings.Builder
 	filterArgs := make([]interface{}, 0)
 	if req.Id != "" {
 		filterArgs = append(filterArgs, req.Id)
-		query.WriteString(fmt.Sprintf(" AND id = $%d", len(filterArgs)))
+		whereQuery.WriteString(fmt.Sprintf(" AND id = $%d", len(filterArgs)))
 	}
 	if req.Race != "" {
 		filterArgs = append(filterArgs, req.Race)
-		query.WriteString(fmt.Sprintf(" AND race = $%d", len(filterArgs)))
+		whereQuery.WriteString(fmt.Sprintf(" AND race = $%d", len(filterArgs)))
 	}
 	if req.Sex != "" {
 		filterArgs = append(filterArgs, req.Sex)
-		query.WriteString(fmt.Sprintf(" AND sex = $%d", len(filterArgs)))
+		whereQuery.WriteString(fmt.Sprintf(" AND sex = $%d", len(filterArgs)))
 	}
 	if req.UserId != "" {
 		filterArgs = append(filterArgs, req.UserId)
-		query.WriteString(fmt.Sprintf(" AND user_id = $%d", len(filterArgs)))
+		whereQuery.WriteString(fmt.Sprintf(" AND user_id = $%d", len(filterArgs)))
 	}
-	return strings.Replace(getQuery, "?", query.String(), 1), filterArgs
+	if req.Name != "" {
+		filterArgs = append(filterArgs, req.Name)
+		whereQuery.WriteString(fmt.Sprintf(" AND name = $%d", len(filterArgs)))
+	}
+
+	fullQuery := strings.Replace(getQuery, "{{ where_query }}", whereQuery.String(), 1)
+
+	filterArgs = append(filterArgs, req.Limit)
+	paginationQuery.WriteString(fmt.Sprintf("LIMIT $%d", len(filterArgs)))
+	filterArgs = append(filterArgs, req.Offset)
+	paginationQuery.WriteString(fmt.Sprintf("OFFSET $%d", len(filterArgs)))
+
+	fullQuery = strings.Replace(fullQuery, "{{ pagination_query }}", paginationQuery.String(), 1)
+	return fullQuery, filterArgs
 }
 
 func (r *CatRepo) List(req *domain.GetCatsRequest) ([]domain.Cat, error) {

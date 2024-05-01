@@ -40,7 +40,7 @@ type listCatsRequest struct {
 	Limit      int    `validate:"gt=0"`
 	Offset     int
 	Race       string
-	Sex        string `validate:"oneof=male female"`
+	Sex        string `validate:"omitempty,oneof=male female"`
 	HasMatched string `validate:"omitempty,boolean"`
 	AgeInMonth string `validate:"compares_int"`
 	Owned      string `validate:"omitempty,boolean"`
@@ -91,6 +91,7 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 	if err != nil {
 		return invalidInput(c, err)
 	}
+
 	req := listCatsRequest{
 		Id:         queries["id"],
 		Limit: 		  limitNum,
@@ -100,7 +101,7 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 		HasMatched: queries["hasMatched"],
 		AgeInMonth: queries["ageInMonth"],
 		Owned:      queries["owned"],
-		Name:       queries["name"],
+		Name:       queries["search"],
 	}
 
 	if err := validate.Struct(req); err != nil {
