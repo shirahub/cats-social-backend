@@ -3,8 +3,8 @@ package service
 import (
 	"app/domain"
 	"app/port"
+	"time"
 )
-
 
 type catManagementSvc struct {
 	repo port.CatRepository
@@ -26,6 +26,6 @@ func (h *catManagementSvc) Update(cat *domain.Cat) (*domain.Cat, error) {
 	return h.repo.Update(cat)
 }
 
-func (h *catManagementSvc) Delete(userId string, catId string) (string, string, error) {
+func (h *catManagementSvc) Delete(userId string, catId string) (string, time.Time, error) {
 	return h.repo.Delete(userId, catId)
 }

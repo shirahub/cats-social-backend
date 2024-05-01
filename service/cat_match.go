@@ -3,6 +3,7 @@ package service
 import (
 	"app/domain"
 	"app/port"
+	"time"
 )
 
 
@@ -18,6 +19,6 @@ func (s *catMatchSvc) Create(catMatch *domain.CatMatch) (*domain.CatMatch, error
 	return s.repo.Create(catMatch)
 }
 
-func (s *catMatchSvc) Delete(userId string, catMatchId string) (string, string, error) {
+func (s *catMatchSvc) Delete(userId string, catMatchId string) (string, time.Time, error) {
 	return s.repo.Delete(userId, catMatchId)
 }

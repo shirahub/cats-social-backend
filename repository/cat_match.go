@@ -34,8 +34,8 @@ func (r *CatMatchRepo) Create(match *domain.CatMatch) (*domain.CatMatch, error) 
 	return match, err
 }
 
-func (r *CatMatchRepo) Delete(userId string, matchId string) (string, string, error) {
+func (r *CatMatchRepo) Delete(userId string, matchId string) (string, time.Time, error) {
 	var deletedMatchId string
 	err := r.db.QueryRow(deleteMatchQuery, matchId).Scan(&deletedMatchId)
-	return deletedMatchId, time.Now().String(), err
+	return deletedMatchId, time.Now(), err
 }

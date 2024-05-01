@@ -7,8 +7,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const iso8601 = "2006-01-02T15:04:05.999Z"
-
 type catManagementHandler struct {
 	svc port.CatManagementService
 }
@@ -16,21 +14,10 @@ type catManagementHandler struct {
 func NewCatManagementHandler(svc port.CatManagementService) *catManagementHandler {
 	return &catManagementHandler{svc}
 }
-/*
-Persian"
-			- "Maine Coon"
-			- "Siamese"
-			- "Ragdoll"
-			- "Bengal"
-			- "Sphynx"
-			- "British Shorthair"
-			- "Abyssinian"
-			- "Scottish Fold"
-			- "Birman
-*/
+
 type createUpdateCatRequest struct {
 	Name        string   `validate:"min=1,max=30"`
-	Race        string   `validate:"oneof='Maine Coon' Siamese Ragdoll"`
+	Race        string   `validate:"oneof_races"`
 	Sex         string   `validate:"oneof=male female"`
 	AgeInMonth  int      `validate:"min=1,max=120082"`
 	Description string   `validate:"min=1,max=200"`
@@ -44,7 +31,7 @@ type listCatsRequest struct {
 	Race       string
 	Sex        string `validate:"omitempty,oneof=male female"`
 	HasMatched string `validate:"omitempty,boolean"`
-	AgeInMonth string `validate:"compares_int"`
+	AgeInMonth string `validate:"omitempty,compares_int"`
 	Owned      string `validate:"omitempty,boolean"`
 	Name       string
 }
@@ -76,7 +63,7 @@ func (h *catManagementHandler) Create(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "success",
 		"data": fiber.Map{
-			"id": newRecord.Id,
+			"id":        newRecord.Id,
 			"createdAt": newRecord.CreatedAt.Format(iso8601),
 		},
 	})
@@ -137,7 +124,7 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message": "success",
-		"data": cats,
+		"data":    cats,
 	})
 }
 
@@ -198,7 +185,7 @@ func (h *catManagementHandler) Delete(c *fiber.Ctx) error {
 		"message": "success",
 		"data": fiber.Map{
 			"id": catId,
-			"deletedAt": deletedAt,
+			"deletedAt": deletedAt.Format(iso8601),
 		},
 	})
 }

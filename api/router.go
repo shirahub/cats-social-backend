@@ -6,6 +6,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+const iso8601 = "2006-01-02T15:04:05.999Z"
+
 type router struct {
 	*userHandler
 	*catManagementHandler
@@ -28,6 +30,7 @@ var validate = validator.New()
 
 // SetupRoutes setup router api
 func (r *router) Setup(app *fiber.App) {
+	validate.RegisterValidation("oneof_races", validateRace)
 	validate.RegisterValidation("compares_int", validateComparison)
 
 	// Middleware

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 	"database/sql"
 	"github.com/lib/pq"
 )
@@ -150,8 +151,9 @@ func (r *CatRepo) Update(cat *domain.Cat) (*domain.Cat, error) {
 	return cat, err
 }
 
-func (r *CatRepo) Delete(userId string, catId string) (string, string, error) {
-	var deletedCatId, deletedAt string
+func (r *CatRepo) Delete(userId string, catId string) (string, time.Time, error) {
+	var deletedCatId string
+	var deletedAt time.Time
 	err := r.db.QueryRow(
 		updateDeletedAtQuery,
 		userId, catId,
@@ -159,9 +161,9 @@ func (r *CatRepo) Delete(userId string, catId string) (string, string, error) {
 	if err != nil {
 		fmt.Println(err)
 		if err == sql.ErrNoRows {
-			return "", "", domain.ErrNotFound
+			return "", time.Time{}, domain.ErrNotFound
 		} else {
-			return "", "", err
+			return "", time.Time{}, err
 		}
 	}
 	

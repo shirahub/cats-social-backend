@@ -17,3 +17,21 @@ func validateComparison(fl validator.FieldLevel) bool {
 
 	return true
 }
+
+var races = map[string]struct{}{
+	"Persian":    struct{}{},
+	"Maine Coon": struct{}{},
+	"Siamese":    struct{}{},
+	"Ragdoll":    struct{}{},
+	"Bengal":     struct{}{},
+	"Sphynx":     struct{}{},
+	"British Shorthair": struct{}{},
+	"Abyssinian":    struct{}{},
+	"Scottish Fold": struct{}{},
+	"Birman":        struct{}{},
+}
+
+func validateRace(fl validator.FieldLevel) bool {
+	_, exists := races[fl.Field().String()]
+	return exists
+}

@@ -45,7 +45,7 @@ func (h *catMatchHandler) Create(c *fiber.Ctx) error {
 		"message": "success",
 		"data": fiber.Map{
 			"id": newRecord.Id,
-			"createdAt": newRecord.CreatedAt,
+			"createdAt": newRecord.CreatedAt.Format(iso8601),
 		},
 	})
 }
