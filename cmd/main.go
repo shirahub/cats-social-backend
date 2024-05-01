@@ -2,6 +2,7 @@ package main
 
 import (
 	"app/repository"
+	"app/service"
 	"app/api"
 	"log"
 
@@ -25,8 +26,10 @@ func main() {
 	catRepo := repository.NewCatRepo(dbConn)
 	matchRepo := repository.NewMatchRepo(dbConn)
 
+	catSvc := service.NewCatManagementService(catRepo)
+
 	userHandler := api.NewUserHandler(userRepo)
-	catMgtHandler := api.NewCatManagementHandler(catRepo)
+	catMgtHandler := api.NewCatManagementHandler(catSvc)
 	catMatchHandler := api.NewCatMatchHandler(matchRepo)
 
 	router := api.NewRouter(userHandler, catMgtHandler, catMatchHandler)

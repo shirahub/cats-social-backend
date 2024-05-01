@@ -7,11 +7,11 @@ import (
 
 
 type catManagementHandler struct {
-	repo port.CatRepository
+	svc port.CatManagementService
 }
 
-func NewCatManagementHandler(repo port.CatRepository) *catManagementHandler {
-	return &catManagementHandler{repo}
+func NewCatManagementHandler(svc port.CatManagementService) *catManagementHandler {
+	return &catManagementHandler{svc}
 }
 
 func (h *catManagementHandler) Create(c *fiber.Ctx) error {
