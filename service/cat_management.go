@@ -18,7 +18,7 @@ func (h *catManagementSvc) Create(cat *domain.CreateCatRequest) (*domain.Cat, er
 	return h.repo.Create(cat)
 }
 
-func (h *catManagementSvc) Update(cat *domain.Cat) error {
+func (h *catManagementSvc) Update(cat *domain.Cat) (*domain.Cat, error) {
 	return h.repo.Update(cat)
 }
 

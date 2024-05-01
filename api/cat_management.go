@@ -68,7 +68,7 @@ func (h *catManagementHandler) Create(c *fiber.Ctx) error {
 
 func (h *catManagementHandler) List(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
-		"status": "success",
+		"message": "success",
 	})
 }
 
@@ -94,16 +94,30 @@ func (h *catManagementHandler) Update(c *fiber.Ctx) error {
 		UserId:      "1",
 	}
 
-	h.svc.Update(&cat)
+	updatedRecord, err := h.svc.Update(&cat)
+
+	if err != nil {
+		if err == domain.ErrNotFound {
+			return serverError(c, fiber.StatusNotFound, "", err)
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "error",
+			"errors": err.Error(),
+		})
+	}
 
 	return c.JSON(fiber.Map{
-		"status": "success",
+		"message": "success",
+		"data": fiber.Map{
+			"id": updatedRecord.Id,
+			"updatedAt": updatedRecord.UpdatedAt,
+		},
 	})
 }
 
 func (h *catManagementHandler) Delete(c *fiber.Ctx) error {
 	h.svc.Delete("1", c.Params("id"))
 	return c.JSON(fiber.Map{
-		"status": "success",
+		"message": "success",
 	})
 }

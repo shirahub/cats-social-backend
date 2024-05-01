@@ -2,18 +2,18 @@ package api
 
 import "github.com/gofiber/fiber/v2"
 
-func failedToParseInput(c *fiber.Ctx, err error) error {
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+func serverError(c *fiber.Ctx, statusCode int, message string, err error) error {
+	return c.Status(statusCode).JSON(fiber.Map{
 		"status": "error",
-		"message": "Failed to parse input",
+		"message": message,
 		"errors": err.Error(),
 	})
 }
 
+func failedToParseInput(c *fiber.Ctx, err error) error {
+	return serverError(c, fiber.StatusInternalServerError, "Failed to parse input", err)
+}
+
 func invalidInput(c *fiber.Ctx, err error) error {
-	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-		"status": "error",
-		"message": "Invalid input",
-		"errors": err.Error(),
-	})
+	return serverError(c, fiber.StatusBadRequest, "Invalid input", err)
 }

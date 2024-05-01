@@ -22,6 +22,13 @@ const createQuery = `
 	RETURNING id, created_at
 `
 
+const updateQuery = `
+	UPDATE cats
+	SET name = $1, race = $2, sex = $3, age_in_month = $4, description = $5, image_urls = $6
+	WHERE user_id = $7 and id = $8
+	RETURNING id, updated_at
+`
+
 func (r *CatRepo) Create(cat *domain.CreateCatRequest) (*domain.Cat, error) {
 	newRecord := domain.Cat{
 		Name: cat.Name,
@@ -40,16 +47,20 @@ func (r *CatRepo) Create(cat *domain.CreateCatRequest) (*domain.Cat, error) {
 	return &newRecord, err
 }
 
-func (r *CatRepo) Update(cat *domain.Cat) error {
-	_, err := r.db.Exec(
-		`UPDATE cats
-		SET name = $1, race = $2, sex = $3, age_in_month = $4, description = $5, image_urls = $6
-		WHERE user_id = $7 and id = $8`,
+func (r *CatRepo) Update(cat *domain.Cat) (*domain.Cat, error) {
+	err := r.db.QueryRow(
+		updateQuery,
 		cat.Name, cat.Race, cat.Sex, cat.AgeInMonth, cat.Description, pq.Array(cat.ImageUrls),
 		cat.UserId, cat.Id,
-	)
-	fmt.Println(err)
-	return err
+	).Scan(&cat.Id, &cat.UpdatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, domain.ErrNotFound
+		} else {
+			return nil, err
+		}
+	}
+	return cat, err
 }
 
 func (r *CatRepo) Delete(userId string, catId string) error {
