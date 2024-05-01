@@ -17,3 +17,7 @@ func NewCatManagementService(repo port.CatRepository) *catManagementSvc {
 func (h *catManagementSvc) Create(cat *domain.CreateCatRequest) error {
 	return h.repo.Create(cat)
 }
+
+func (h *catManagementSvc) Update(cat *domain.Cat) error {
+	return h.repo.Update(cat)
+}

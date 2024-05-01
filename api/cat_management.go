@@ -26,9 +26,9 @@ Persian"
 			- "Scottish Fold"
 			- "Birman
 */
-type createCatRequest struct {
+type createUpdateCatRequest struct {
 	Name        string   `validate:"min=1,max=30"`
-	Race        string   `validate:"oneof='maine coon' siamese ragdoll"`
+	Race        string   `validate:"oneof='Maine Coon' Siamese Ragdoll"`
 	Sex         string   `validate:"oneof=male female"`
 	AgeInMonth  int      `validate:"min=1,max=120082"`
 	Description string   `validate:"min=1,max=200"`
@@ -36,26 +36,26 @@ type createCatRequest struct {
 }
 
 func (h *catManagementHandler) Create(c *fiber.Ctx) error {
-	cat := new(createCatRequest)
-	if err := c.BodyParser(cat); err != nil {
+	req := new(createUpdateCatRequest)
+	if err := c.BodyParser(req); err != nil {
 		return failedToParseInput(c, err)
 	}
 
 	validate := validator.New()
-	if err := validate.Struct(cat); err != nil {
+	if err := validate.Struct(req); err != nil {
 		return invalidInput(c, err)
 	}
 
-	req := domain.CreateCatRequest{
-		Name:        cat.Name,
-		Race: 			 cat.Race,
-		Sex:         cat.Sex,
-		AgeInMonth:  cat.AgeInMonth,
-		Description: cat.Description,
-		ImageUrls:   cat.ImageUrls,
-		UserId:      1,
+	cat := domain.CreateCatRequest{
+		Name:        req.Name,
+		Race: 			 req.Race,
+		Sex:         req.Sex,
+		AgeInMonth:  req.AgeInMonth,
+		Description: req.Description,
+		ImageUrls:   req.ImageUrls,
+		UserId:      "1",
 	}
-	h.svc.Create(&req)
+	h.svc.Create(&cat)
 
 	return c.JSON(fiber.Map{
 		"status": "success",
@@ -69,6 +69,29 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 }
 
 func (h *catManagementHandler) Update(c *fiber.Ctx) error {
+	req := new(createUpdateCatRequest)
+	if err := c.BodyParser(req); err != nil {
+		return failedToParseInput(c, err)
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(req); err != nil {
+		return invalidInput(c, err)
+	}
+
+	cat := domain.Cat{
+		Id:          c.Params("id"),
+		Name:        req.Name,
+		Race:        req.Race,
+		Sex:         req.Sex,
+		AgeInMonth:  req.AgeInMonth,
+		Description: req.Description,
+		ImageUrls:   req.ImageUrls,
+		UserId:      "1",
+	}
+
+	h.svc.Update(&cat)
+
 	return c.JSON(fiber.Map{
 		"status": "success",
 	})
