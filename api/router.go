@@ -8,12 +8,18 @@ import (
 type router struct {
 	*userHandler
 	*catManagementHandler
+	*catMatchHandler
 }
 
-func NewRouter(userHandler *userHandler, catMgtHandler *catManagementHandler) *router {
+func NewRouter(
+	userHandler *userHandler,
+	catMgtHandler *catManagementHandler,
+	catMatchHandler *catMatchHandler,
+) *router {
 	return &router{
 		userHandler: userHandler,
 		catManagementHandler: catMgtHandler,
+		catMatchHandler: catMatchHandler,
 	}
 }
 
@@ -27,9 +33,12 @@ func (r *router) Setup(app *fiber.App) {
 	user.Post("/register", r.userHandler.Register)
 	user.Post("/login", r.userHandler.Login)
 
-	catManagement := api.Group("/cat")
-	catManagement.Post("", r.catManagementHandler.Create)
-	catManagement.Get("", r.catManagementHandler.List)
-	catManagement.Put("/:id", r.catManagementHandler.Update)
-	catManagement.Delete("/:id", r.catManagementHandler.Delete)
+	cat := api.Group("/cat")
+	cat.Post("", r.catManagementHandler.Create)
+	cat.Get("", r.catManagementHandler.List)
+	cat.Put("/:id", r.catManagementHandler.Update)
+	cat.Delete("/:id", r.catManagementHandler.Delete)
+
+	match := cat.Group("/match")
+	match.Post("", r.catMatchHandler.Create)
 }
