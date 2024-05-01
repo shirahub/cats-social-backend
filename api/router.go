@@ -46,4 +46,8 @@ func (r *router) Setup(app *fiber.App) {
 
 	match := cat.Group("/match")
 	match.Post("", r.catMatchHandler.Create)
+	match.Get("", r.catMatchHandler.List)
+	match.Post("/approve", r.catMatchHandler.Approve)
+	match.Post("/reject", r.catMatchHandler.Reject)
+	match.Delete("/:id", r.catMatchHandler.Delete)
 }

@@ -8,3 +8,7 @@ type CatManagementService interface {
 	Update(*domain.Cat) (*domain.Cat, error)
 	Delete(userId string, catId string) (string, string, error)
 }
+
+type CatMatchService interface {
+	Create(catMatch *domain.CatMatch) (*domain.CatMatch, error)
+}
