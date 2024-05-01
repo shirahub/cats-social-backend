@@ -18,6 +18,10 @@ func (h *catManagementSvc) Create(cat *domain.CreateCatRequest) (*domain.Cat, er
 	return h.repo.Create(cat)
 }
 
+func (h *catManagementSvc) List(req *domain.GetCatsRequest) ([]domain.Cat, error) {
+	return h.repo.List(req)
+}
+
 func (h *catManagementSvc) Update(cat *domain.Cat) (*domain.Cat, error) {
 	return h.repo.Update(cat)
 }

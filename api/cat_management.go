@@ -3,8 +3,8 @@ package api
 import (
 	"app/domain"
 	"app/port"
+	"strconv"
 	"github.com/gofiber/fiber/v2"
-	"github.com/go-playground/validator/v10"
 )
 
 type catManagementHandler struct {
@@ -35,13 +35,24 @@ type createUpdateCatRequest struct {
 	ImageUrls   []string `validate:"min=1,max=10"`
 }
 
+type listCatsRequest struct {
+	Id         string
+	Limit      int    `validate:"gt=0"`
+	Offset     int
+	Race       string
+	Sex        string `validate:"oneof=male female"`
+	HasMatched string `validate:"omitempty,boolean"`
+	AgeInMonth string `validate:"compares_int"`
+	Owned      string `validate:"omitempty,boolean"`
+	Name       string
+}
+
 func (h *catManagementHandler) Create(c *fiber.Ctx) error {
 	req := new(createUpdateCatRequest)
 	if err := c.BodyParser(req); err != nil {
 		return failedToParseInput(c, err)
 	}
 
-	validate := validator.New()
 	if err := validate.Struct(req); err != nil {
 		return invalidInput(c, err)
 	}
@@ -67,8 +78,56 @@ func (h *catManagementHandler) Create(c *fiber.Ctx) error {
 }
 
 func (h *catManagementHandler) List(c *fiber.Ctx) error {
+	queries := c.Queries()
+
+	limit := queries["limit"]
+	limitNum, err := strconv.Atoi(limit)
+	if err != nil {
+		return invalidInput(c, err)
+	}
+
+	offset := queries["offset"]
+	offsetNum, err := strconv.Atoi(offset)
+	if err != nil {
+		return invalidInput(c, err)
+	}
+	req := listCatsRequest{
+		Id:         queries["id"],
+		Limit: 		  limitNum,
+		Offset: 	  offsetNum,
+		Race:       queries["race"],
+		Sex:        queries["sex"],
+		HasMatched: queries["hasMatched"],
+		AgeInMonth: queries["ageInMonth"],
+		Owned:      queries["owned"],
+		Name:       queries["name"],
+	}
+
+	if err := validate.Struct(req); err != nil {
+		return invalidInput(c, err)
+	}
+
+	ownedBool, _ := strconv.ParseBool(req.Owned)
+
+	getReq := domain.GetCatsRequest{
+		Id:         req.Id,
+		Limit:      req.Limit,
+		Offset:     req.Offset,
+		Race:       req.Race,
+		Sex:        req.Sex,
+		AgeInMonth: req.AgeInMonth,
+		Name:       req.Name,
+	}
+
+	if ownedBool {
+		getReq.UserId = "1"
+	}
+
+	cats, err := h.svc.List(&getReq)
+
 	return c.JSON(fiber.Map{
 		"message": "success",
+		"data": cats,
 	})
 }
 
@@ -78,7 +137,6 @@ func (h *catManagementHandler) Update(c *fiber.Ctx) error {
 		return failedToParseInput(c, err)
 	}
 
-	validate := validator.New()
 	if err := validate.Struct(req); err != nil {
 		return invalidInput(c, err)
 	}

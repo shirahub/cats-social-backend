@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/go-playground/validator/v10"
 )
 
 type router struct {
@@ -23,8 +24,12 @@ func NewRouter(
 	}
 }
 
+var validate = validator.New()
+
 // SetupRoutes setup router api
 func (r *router) Setup(app *fiber.App) {
+	validate.RegisterValidation("compares_int", validateComparison)
+
 	// Middleware
 	api := app.Group("/v1", logger.New())
 
