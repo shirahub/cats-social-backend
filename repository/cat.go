@@ -25,8 +25,15 @@ const createQuery = `
 const updateQuery = `
 	UPDATE cats
 	SET name = $1, race = $2, sex = $3, age_in_month = $4, description = $5, image_urls = $6
-	WHERE user_id = $7 and id = $8
+	WHERE user_id = $7 and id = $8 and deleted_at is null
 	RETURNING id, updated_at
+`
+
+const updateDeletedAtQuery = `
+	UPDATE cats
+	SET deleted_at = NOW()
+	WHERE user_id = $1 and id = $2 and deleted_at is null
+	RETURNING id, deleted_at
 `
 
 func (r *CatRepo) Create(cat *domain.CreateCatRequest) (*domain.Cat, error) {
@@ -63,12 +70,20 @@ func (r *CatRepo) Update(cat *domain.Cat) (*domain.Cat, error) {
 	return cat, err
 }
 
-func (r *CatRepo) Delete(userId string, catId string) error {
-	_, err := r.db.Exec(
-		`DELETE FROM cats
-		WHERE user_id = $1 and id = $2`,
+func (r *CatRepo) Delete(userId string, catId string) (string, string, error) {
+	var deletedCatId, deletedAt string
+	err := r.db.QueryRow(
+		updateDeletedAtQuery,
 		userId, catId,
-	)
-	fmt.Println(err)
-	return err
+	).Scan(&deletedCatId, &deletedAt)
+	if err != nil {
+		fmt.Println(err)
+		if err == sql.ErrNoRows {
+			return "", "", domain.ErrNotFound
+		} else {
+			return "", "", err
+		}
+	}
+	
+	return deletedCatId, deletedAt, err
 }

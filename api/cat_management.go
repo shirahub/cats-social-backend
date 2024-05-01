@@ -116,8 +116,21 @@ func (h *catManagementHandler) Update(c *fiber.Ctx) error {
 }
 
 func (h *catManagementHandler) Delete(c *fiber.Ctx) error {
-	h.svc.Delete("1", c.Params("id"))
+	catId, deletedAt, err := h.svc.Delete("1", c.Params("id"))
+	if err != nil {
+		if err == domain.ErrNotFound {
+			return serverError(c, fiber.StatusNotFound, "", err)
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "error",
+			"errors": err.Error(),
+		})
+	}
 	return c.JSON(fiber.Map{
 		"message": "success",
+		"data": fiber.Map{
+			"id": catId,
+			"deletedAt": deletedAt,
+		},
 	})
 }
