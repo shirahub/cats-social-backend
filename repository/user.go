@@ -14,7 +14,10 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 }
 
 func (r *UserRepo) Create(user domain.User) error {
-	_, err := r.db.Exec("INSERT INTO users (email, name, password) VALUES ($1, $2, $3)", user.Email, user.Name, user.Password)
+	_, err := r.db.Exec(
+		"INSERT INTO users (email, name, password) VALUES ($1, $2, $3)",
+		user.Email, user.Name, user.Password,
+	)
 	return err
 }
 
