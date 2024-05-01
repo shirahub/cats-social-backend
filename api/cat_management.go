@@ -102,6 +102,7 @@ func (h *catManagementHandler) Update(c *fiber.Ctx) error {
 }
 
 func (h *catManagementHandler) Delete(c *fiber.Ctx) error {
+	h.svc.Delete("1", c.Params("id"))
 	return c.JSON(fiber.Map{
 		"status": "success",
 	})

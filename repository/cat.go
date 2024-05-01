@@ -51,3 +51,13 @@ func (r *CatRepo) Update(cat *domain.Cat) error {
 	fmt.Println(err)
 	return err
 }
+
+func (r *CatRepo) Delete(userId string, catId string) error {
+	_, err := r.db.Exec(
+		`DELETE FROM cats
+		WHERE user_id = $1 and id = $2`,
+		userId, catId,
+	)
+	fmt.Println(err)
+	return err
+}
