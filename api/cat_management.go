@@ -126,6 +126,10 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 
 	cats, err := h.svc.List(&getReq)
 
+	if err != nil {
+		return serverError(c, fiber.StatusInternalServerError, "", err)
+	}
+
 	return c.JSON(fiber.Map{
 		"message": "success",
 		"data": cats,

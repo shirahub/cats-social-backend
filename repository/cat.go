@@ -3,6 +3,7 @@ package repository
 import (
 	"app/domain"
 	"fmt"
+	"regexp"
 	"strings"
 	"database/sql"
 	"github.com/lib/pq"
@@ -46,6 +47,8 @@ const updateDeletedAtQuery = `
 	RETURNING id, deleted_at
 `
 
+const comparisonPattern = `^([<>]=?|=)\s*(\d+)$`
+
 func (r *CatRepo) Create(cat *domain.CreateCatRequest) (*domain.Cat, error) {
 	newRecord := domain.Cat{
 		Name: cat.Name,
@@ -79,6 +82,12 @@ func formGetQuery(req *domain.GetCatsRequest) (string, []interface{}) {
 		filterArgs = append(filterArgs, req.Sex)
 		whereQuery.WriteString(fmt.Sprintf(" AND sex = $%d", len(filterArgs)))
 	}
+	if req.AgeInMonth != "" {
+		re := regexp.MustCompile(comparisonPattern)
+		matches := re.FindStringSubmatch(req.AgeInMonth)
+		filterArgs = append(filterArgs, matches[2])
+		whereQuery.WriteString(fmt.Sprintf(" AND age_in_month %s $%d", matches[1], len(filterArgs)))
+	}
 	if req.UserId != "" {
 		filterArgs = append(filterArgs, req.UserId)
 		whereQuery.WriteString(fmt.Sprintf(" AND user_id = $%d", len(filterArgs)))
@@ -108,7 +117,7 @@ func (r *CatRepo) List(req *domain.GetCatsRequest) ([]domain.Cat, error) {
 
 	defer rows.Close()
 
-	var cats []domain.Cat
+	var cats = make([]domain.Cat, 0)
 	for rows.Next() {
 		var cat domain.Cat
 		if err := rows.Scan(
