@@ -9,6 +9,8 @@ type Cat struct {
 	Description string
 	ImageUrls   []string
 	UserId      string
+	CreatedAt   string
+	UpdatedAt   string
 }
 
 type CreateCatRequest struct {

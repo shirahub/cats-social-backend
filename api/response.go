@@ -3,7 +3,7 @@ package api
 import "github.com/gofiber/fiber/v2"
 
 func failedToParseInput(c *fiber.Ctx, err error) error {
-	return c.Status(500).JSON(fiber.Map{
+	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 		"status": "error",
 		"message": "Failed to parse input",
 		"errors": err.Error(),

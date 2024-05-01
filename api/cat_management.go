@@ -55,10 +55,14 @@ func (h *catManagementHandler) Create(c *fiber.Ctx) error {
 		ImageUrls:   req.ImageUrls,
 		UserId:      "1",
 	}
-	h.svc.Create(&cat)
+	newRecord, _ := h.svc.Create(&cat)
 
-	return c.JSON(fiber.Map{
-		"status": "success",
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "success",
+		"data": fiber.Map{
+			"id": newRecord.Id,
+			"createdAt": newRecord.CreatedAt,
+		},
 	})
 }
 
