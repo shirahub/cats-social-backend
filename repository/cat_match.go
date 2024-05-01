@@ -21,10 +21,23 @@ const createMatchQuery = `
 	RETURNING id, created_at
 `
 
-const deleteMatchQuery = `
-	DELETE FROM cat_matches
-	WHERE id = $1 AND status = 'pending'
-	RETURNING id
+const getMatchByIdUserIdQuery = `
+	SELECT cat_matches.id, message, issuer_cat_id, receiver_cat_id, status, cat_matches.created_at
+	FROM cat_matches
+	INNER JOIN cats ON cat_matches.issuer_cat_id = cats.id
+	WHERE cat_matches.id = $1 AND user_id = $2 AND cat_matches.deleted_at is null
+`
+
+const updateDeletedAtMatchQuery = `
+	UPDATE cat_matches
+	SET deleted_at = NOW()
+	FROM cats
+	WHERE user_id = $1
+	AND issuer_cat_id = cats.id
+	AND cat_matches.id = $2
+	AND status = 'pending'
+	AND cat_matches.deleted_at is null
+	RETURNING cat_matches.id, cat_matches.deleted_at
 `
 
 func (r *CatMatchRepo) Create(match *domain.CatMatch) (*domain.CatMatch, error) {
@@ -34,8 +47,24 @@ func (r *CatMatchRepo) Create(match *domain.CatMatch) (*domain.CatMatch, error) 
 	return match, err
 }
 
+func (r *CatMatchRepo) GetByIdUserId(matchId string, userId string) (*domain.CatMatch, error) {
+	var match domain.CatMatch
+	err := r.db.QueryRow(
+		getMatchByIdUserIdQuery,
+		matchId, userId,
+	).Scan(&match.Id, &match.Message, &match.IssuerCatId, &match.ReceiverCatId, &match.Status, &match.CreatedAt)
+	if err == sql.ErrNoRows {
+		return nil, domain.ErrNotFound
+	}
+	return &match, err
+}
+
 func (r *CatMatchRepo) Delete(userId string, matchId string) (string, time.Time, error) {
 	var deletedMatchId string
-	err := r.db.QueryRow(deleteMatchQuery, matchId).Scan(&deletedMatchId)
-	return deletedMatchId, time.Now(), err
+	var deletedAt time.Time
+	err := r.db.QueryRow(updateDeletedAtMatchQuery, userId, matchId).Scan(&deletedMatchId, &deletedAt)
+	if err == sql.ErrNoRows {
+		return "", time.Time{}, domain.ErrNotFound
+	}
+	return deletedMatchId, deletedAt, err
 }

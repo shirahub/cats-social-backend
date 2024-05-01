@@ -71,6 +71,12 @@ func (h *catMatchHandler) Reject(c *fiber.Ctx) error {
 func (h *catMatchHandler) Delete(c *fiber.Ctx) error {
 	id, deletedAt, err := h.svc.Delete("1", c.Params("id"))
 	if err != nil {
+		if err == domain.ErrNotFound {
+			return serverError(c, fiber.StatusNotFound, "", err)
+		}
+		if err == domain.ErrMatchResponded {
+			return serverError(c, fiber.StatusBadRequest, "", err)
+		}
 		return serverError(c, fiber.StatusInternalServerError, "", err)
 	}
 

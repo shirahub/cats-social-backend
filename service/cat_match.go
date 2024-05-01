@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-
 type catMatchSvc struct {
 	repo port.CatMatchRepository
 }
@@ -20,5 +19,13 @@ func (s *catMatchSvc) Create(catMatch *domain.CatMatch) (*domain.CatMatch, error
 }
 
 func (s *catMatchSvc) Delete(userId string, catMatchId string) (string, time.Time, error) {
-	return s.repo.Delete(userId, catMatchId)
+	matchId, deletedAt, err := s.repo.Delete(userId, catMatchId)
+	if err == domain.ErrNotFound {
+		_, err = s.repo.GetByIdUserId(catMatchId, userId)
+		if err == domain.ErrNotFound {
+			return "", time.Time{}, domain.ErrNotFound
+		}
+		return "", time.Time{}, domain.ErrMatchResponded
+	}
+	return matchId, deletedAt, nil
 }

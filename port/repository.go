@@ -14,5 +14,6 @@ type CatRepository interface {
 
 type CatMatchRepository interface {
 	Create(*domain.CatMatch) (*domain.CatMatch, error)
+	GetByIdUserId(matchId string, userId string) (*domain.CatMatch, error)
 	Delete(userId string, matchId string) (id string, deletedAt time.Time, err error)
 }
