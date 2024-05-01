@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS cats(
   name VARCHAR (255) NOT NULL,
   race VARCHAR (255) NOT NULL,
   sex VARCHAR (10) NOT NULL,
-  age_in_months SMALLSERIAL,
+  age_in_month SMALLSERIAL,
   description VARCHAR (255) NOT NULL,
   image_urls VARCHAR[] NOT NULL,
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,

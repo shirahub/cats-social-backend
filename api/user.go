@@ -46,12 +46,12 @@ type registerRequest struct {
 func (h *userHandler) Register(c *fiber.Ctx) error {
 	user := new(registerRequest)
 	if err := c.BodyParser(user); err != nil {
-		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "errors": err.Error()})
+		return failedToParseInput(c, err)
 	}
 
 	validate := validator.New()
 	if err := validate.Struct(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Invalid request body", "errors": err.Error()})
+		return invalidInput(c, err)
 	}
 
 	hash, err := hashPassword(user.Password)
