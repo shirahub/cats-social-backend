@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type Cat struct {
 	Id          string   `json:"id"`
 	Name        string   `json:"name"`
@@ -9,8 +11,8 @@ type Cat struct {
 	Description string   `json:"description"`
 	ImageUrls   []string `json:"imageUrls"`
 	UserId      string   `json:"userId"`
-	CreatedAt   string   `json:"createdAt"`
-	UpdatedAt   string   `json:",omitempty"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   string    `json:",omitempty"`
 }
 
 type CreateCatRequest struct {

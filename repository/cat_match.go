@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"time"
 	"app/domain"
 	"database/sql"
 )
@@ -20,9 +21,21 @@ const createMatchQuery = `
 	RETURNING id, created_at
 `
 
+const deleteMatchQuery = `
+	DELETE FROM cat_matches
+	WHERE id = $1 AND status = 'pending'
+	RETURNING id
+`
+
 func (r *CatMatchRepo) Create(match *domain.CatMatch) (*domain.CatMatch, error) {
 	err := r.db.QueryRow(
 		createMatchQuery, match.Message, match.IssuerCatId, match.ReceiverCatId, "pending",
 	).Scan(&match.Id, &match.CreatedAt)
 	return match, err
+}
+
+func (r *CatMatchRepo) Delete(userId string, matchId string) (string, string, error) {
+	var deletedMatchId string
+	err := r.db.QueryRow(deleteMatchQuery, matchId).Scan(&deletedMatchId)
+	return deletedMatchId, time.Now().String(), err
 }

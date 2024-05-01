@@ -69,7 +69,16 @@ func (h *catMatchHandler) Reject(c *fiber.Ctx) error {
 }
 
 func (h *catMatchHandler) Delete(c *fiber.Ctx) error {
+	id, deletedAt, err := h.svc.Delete("1", c.Params("id"))
+	if err != nil {
+		return serverError(c, fiber.StatusInternalServerError, "", err)
+	}
+
 	return c.JSON(fiber.Map{
 		"message": "success",
+		"data": fiber.Map{
+			"id": id,
+			"deletedAt": deletedAt,
+		},
 	})
 }

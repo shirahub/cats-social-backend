@@ -11,4 +11,5 @@ type CatManagementService interface {
 
 type CatMatchService interface {
 	Create(catMatch *domain.CatMatch) (*domain.CatMatch, error)
+	Delete(userId string, matchId string) (id string, deletedAt string, err error)
 }

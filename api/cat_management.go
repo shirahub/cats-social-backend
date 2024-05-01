@@ -7,6 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+const iso8601 = "2006-01-02T15:04:05.999Z"
+
 type catManagementHandler struct {
 	svc port.CatManagementService
 }
@@ -66,13 +68,16 @@ func (h *catManagementHandler) Create(c *fiber.Ctx) error {
 		ImageUrls:   req.ImageUrls,
 		UserId:      "1",
 	}
-	newRecord, _ := h.svc.Create(&cat)
+	newRecord, err := h.svc.Create(&cat)
+	if err != nil {
+		return serverError(c, fiber.StatusInternalServerError, "", err)
+	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "success",
 		"data": fiber.Map{
 			"id": newRecord.Id,
-			"createdAt": newRecord.CreatedAt,
+			"createdAt": newRecord.CreatedAt.Format(iso8601),
 		},
 	})
 }
