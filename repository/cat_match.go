@@ -47,6 +47,18 @@ const updateStatusMatchQuery = `
 	RETURNING cat_matches.id, cat_matches.updated_at
 `
 
+const invalidateMatchesQuery = `
+	UPDATE cat_matches
+	SET status = 'invalid'
+	FROM cats
+	WHERE status = 'pending'
+	AND cat_matches.deleted_at is null
+	AND (
+		issuer_cat_id = $1 OR receiver_cat_id = $1
+		OR issuer_cat_id = $2 OR receiver_cat_id = $2
+	)
+`
+
 const updateDeletedAtMatchQuery = `
 	UPDATE cat_matches
 	SET deleted_at = NOW()
@@ -98,6 +110,10 @@ func (r *CatMatchRepo) UpdateStatus(matchId string, userId string, status string
 		return "", time.Time{}, domain.ErrNotFound
 	}
 	return updatedMatchId, updatedAt, err
+}
+
+func (r *CatMatchRepo) Invalidate(cat1Id string, cat2Id string) error {
+	return nil
 }
 
 func (r *CatMatchRepo) Delete(matchId string, userId string) (string, time.Time, error) {
