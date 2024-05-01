@@ -17,8 +17,9 @@ func NewCatRepo(db *sql.DB) *CatRepo {
 
 func (r *CatRepo) Create(cat *domain.CreateCatRequest) error {
 	_, err := r.db.Exec(
-		"INSERT INTO cats (name, race, sex, age_in_month, description, image_urls) VALUES ($1, $2, $3, $4, $5, $6)",
-		cat.Name, cat.Race, cat.Sex, cat.AgeInMonth, cat.Description, pq.Array(cat.ImageUrls),
+		"INSERT INTO cats (name, race, sex, age_in_month, description, image_urls, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+		cat.Name, cat.Race, cat.Sex, cat.AgeInMonth, cat.Description,
+		pq.Array(cat.ImageUrls), cat.UserId,
 	)
 	fmt.Println(err)
 	return err

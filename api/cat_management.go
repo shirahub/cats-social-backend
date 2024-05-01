@@ -53,6 +53,7 @@ func (h *catManagementHandler) Create(c *fiber.Ctx) error {
 		AgeInMonth:  cat.AgeInMonth,
 		Description: cat.Description,
 		ImageUrls:   cat.ImageUrls,
+		UserId:      1,
 	}
 	h.svc.Create(&req)
 

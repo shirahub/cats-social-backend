@@ -17,4 +17,5 @@ type CreateCatRequest struct {
 	AgeInMonth  int
 	Description string
 	ImageUrls   []string
+	UserId      uint
 }
