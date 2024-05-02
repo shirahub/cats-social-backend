@@ -55,7 +55,7 @@ func (h *catManagementHandler) Create(c *fiber.Ctx) error {
 		ImageUrls:   req.ImageUrls,
 		UserId:      "1",
 	}
-	newRecord, err := h.svc.Create(&cat)
+	newRecord, err := h.svc.Create(c.Context(), &cat)
 	if err != nil {
 		return serverError(c, fiber.StatusInternalServerError, "", err)
 	}

@@ -3,6 +3,7 @@ package service
 import (
 	"app/domain"
 	"app/port"
+	"context"
 	"time"
 )
 
@@ -14,8 +15,8 @@ func NewCatManagementService(repo port.CatRepository) *catManagementSvc {
 	return &catManagementSvc{repo}
 }
 
-func (h *catManagementSvc) Create(cat *domain.CreateCatRequest) (*domain.Cat, error) {
-	return h.repo.Create(cat)
+func (h *catManagementSvc) Create(ctx context.Context, cat *domain.CreateCatRequest) (*domain.Cat, error) {
+	return h.repo.Create(ctx, cat)
 }
 
 func (h *catManagementSvc) List(req *domain.GetCatsRequest) ([]domain.Cat, error) {

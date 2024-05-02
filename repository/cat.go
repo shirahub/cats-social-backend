@@ -2,6 +2,7 @@ package repository
 
 import (
 	"app/domain"
+	"context"
 	"fmt"
 	"regexp"
 	"strings"
@@ -50,7 +51,7 @@ const updateDeletedAtQuery = `
 
 const comparisonPattern = `^([<>]=?|=)\s*(\d+)$`
 
-func (r *CatRepo) Create(cat *domain.CreateCatRequest) (*domain.Cat, error) {
+func (r *CatRepo) Create(ctx context.Context, cat *domain.CreateCatRequest) (*domain.Cat, error) {
 	newRecord := domain.Cat{
 		Name: cat.Name,
 		Race: cat.Race,
