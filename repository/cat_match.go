@@ -78,6 +78,10 @@ func (r *CatMatchRepo) Create(match *domain.CatMatch) (*domain.CatMatch, error) 
 	return match, err
 }
 
+func (r *CatMatchRepo) List() ([]domain.CatMatch, error) {
+	return nil, nil
+}
+
 func (r *CatMatchRepo) GetIssuedByIdUserId(matchId string, userId string) (*domain.CatMatch, error) {
 	var match domain.CatMatch
 	err := r.db.QueryRow(

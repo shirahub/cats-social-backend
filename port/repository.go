@@ -14,6 +14,7 @@ type CatRepository interface {
 
 type CatMatchRepository interface {
 	Create(*domain.CatMatch) (*domain.CatMatch, error)
+	List() ([]domain.CatMatch, error)
 	GetIssuedByIdUserId(matchId string, userId string) (*domain.CatMatch, error)
 	GetReceivedByIdUserId(matchId string, userId string) (*domain.CatMatch, error)
 	UpdateStatus(matchId string, userId string, status string) (id string, updatedAt time.Time, err error)

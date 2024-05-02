@@ -18,6 +18,10 @@ func (s *catMatchSvc) Create(catMatch *domain.CatMatch) (*domain.CatMatch, error
 	return s.repo.Create(catMatch)
 }
 
+func (s *catMatchSvc) List() ([]domain.CatMatch, error) {
+	return nil, nil
+}
+
 func (s *catMatchSvc) Approve(matchId string, userId string) (id string, updatedAt time.Time, err error) {
 	id, updatedAt, err = s.repo.UpdateStatus(matchId, userId, "approved")
 	if err == domain.ErrNotFound {
