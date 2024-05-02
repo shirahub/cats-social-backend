@@ -9,8 +9,8 @@ import (
 type CatManagementService interface {
 	Create(context.Context, *domain.CreateCatRequest) (*domain.Cat, error)
 	List(context.Context, *domain.GetCatsRequest) ([]domain.Cat, error)
-	Update(*domain.Cat) (*domain.Cat, error)
-	Delete(catId string, userId string, ) (string, time.Time, error)
+	Update(context.Context, *domain.Cat) (*domain.Cat, error)
+	Delete(c context.Context, catId string, userId string, ) (string, time.Time, error)
 }
 
 type CatMatchService interface {

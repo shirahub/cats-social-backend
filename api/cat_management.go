@@ -149,7 +149,7 @@ func (h *catManagementHandler) Update(c *fiber.Ctx) error {
 		UserId:      "1",
 	}
 
-	updatedRecord, err := h.svc.Update(&cat)
+	updatedRecord, err := h.svc.Update(c.Context(), &cat)
 
 	if err != nil {
 		if err == domain.ErrNotFound {
@@ -171,7 +171,7 @@ func (h *catManagementHandler) Update(c *fiber.Ctx) error {
 }
 
 func (h *catManagementHandler) Delete(c *fiber.Ctx) error {
-	catId, deletedAt, err := h.svc.Delete(c.Params("id"), "1")
+	catId, deletedAt, err := h.svc.Delete(c.Context(), c.Params("id"), "1")
 	if err != nil {
 		if err == domain.ErrNotFound {
 			return serverError(c, fiber.StatusNotFound, "", err)

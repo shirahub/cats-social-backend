@@ -136,9 +136,9 @@ func (r *CatRepo) List(c context.Context, req *domain.GetCatsRequest) ([]domain.
 	return cats, err
 }
 
-func (r *CatRepo) Update(cat *domain.Cat) (*domain.Cat, error) {
-	err := r.db.QueryRow(
-		updateQuery,
+func (r *CatRepo) Update(c context.Context, cat *domain.Cat) (*domain.Cat, error) {
+	err := r.db.QueryRowContext(
+		c, updateQuery,
 		cat.Name, cat.Race, cat.Sex, cat.AgeInMonth, cat.Description, pq.Array(cat.ImageUrls),
 		cat.UserId, cat.Id,
 	).Scan(&cat.Id, &cat.UpdatedAt)
@@ -152,12 +152,11 @@ func (r *CatRepo) Update(cat *domain.Cat) (*domain.Cat, error) {
 	return cat, err
 }
 
-func (r *CatRepo) Delete(catId string, userId string) (string, time.Time, error) {
+func (r *CatRepo) Delete(c context.Context, catId string, userId string) (string, time.Time, error) {
 	var deletedCatId string
 	var deletedAt time.Time
-	err := r.db.QueryRow(
-		updateDeletedAtQuery,
-		userId, catId,
+	err := r.db.QueryRowContext(
+		c, updateDeletedAtQuery, userId, catId,
 	).Scan(&deletedCatId, &deletedAt)
 	if err != nil {
 		fmt.Println(err)

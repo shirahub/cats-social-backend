@@ -23,10 +23,10 @@ func (h *catManagementSvc) List(ctx context.Context, req *domain.GetCatsRequest)
 	return h.repo.List(ctx, req)
 }
 
-func (h *catManagementSvc) Update(cat *domain.Cat) (*domain.Cat, error) {
-	return h.repo.Update(cat)
+func (h *catManagementSvc) Update(ctx context.Context, cat *domain.Cat) (*domain.Cat, error) {
+	return h.repo.Update(ctx, cat)
 }
 
-func (h *catManagementSvc) Delete(catId string, userId string) (string, time.Time, error) {
-	return h.repo.Delete(catId, userId)
+func (h *catManagementSvc) Delete(ctx context.Context, catId string, userId string) (string, time.Time, error) {
+	return h.repo.Delete(ctx, catId, userId)
 }
