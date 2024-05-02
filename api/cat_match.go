@@ -36,7 +36,7 @@ func (h *catMatchHandler) Create(c *fiber.Ctx) error {
 		Message: req.Message,
 	}
 
-	newRecord, err := h.svc.Create(&match)
+	newRecord, err := h.svc.Create(c.Context(), &match)
 	if err != nil {
 		return serverError(c, fiber.StatusInternalServerError, "", err)
 	}
@@ -119,7 +119,7 @@ func (h *catMatchHandler) Reject(c *fiber.Ctx) error {
 }
 
 func (h *catMatchHandler) Delete(c *fiber.Ctx) error {
-	id, deletedAt, err := h.svc.Delete(c.Params("id"), "1")
+	id, deletedAt, err := h.svc.Delete(c.Context(), c.Params("id"), "1")
 	if err != nil {
 		if err == domain.ErrNotFound {
 			return serverError(c, fiber.StatusNotFound, "", err)

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"time"
 	"app/domain"
 	"database/sql"
@@ -71,9 +72,9 @@ const updateDeletedAtMatchQuery = `
 	RETURNING cat_matches.id, cat_matches.deleted_at
 `
 
-func (r *CatMatchRepo) Create(match *domain.CatMatch) (*domain.CatMatch, error) {
-	err := r.db.QueryRow(
-		createMatchQuery, match.Message, match.IssuerCatId, match.ReceiverCatId, "pending",
+func (r *CatMatchRepo) Create(c context.Context, match *domain.CatMatch) (*domain.CatMatch, error) {
+	err := r.db.QueryRowContext(
+		c, createMatchQuery, match.Message, match.IssuerCatId, match.ReceiverCatId, "pending",
 	).Scan(&match.Id, &match.CreatedAt)
 	return match, err
 }
@@ -126,10 +127,10 @@ func (r *CatMatchRepo) Reject(matchId string, userId string) (string, time.Time,
 	return updatedMatchId, updatedAt, err
 }
 
-func (r *CatMatchRepo) Delete(matchId string, userId string) (string, time.Time, error) {
+func (r *CatMatchRepo) Delete(c context.Context, matchId string, userId string) (string, time.Time, error) {
 	var deletedMatchId string
 	var deletedAt time.Time
-	err := r.db.QueryRow(updateDeletedAtMatchQuery, userId, matchId).Scan(&deletedMatchId, &deletedAt)
+	err := r.db.QueryRowContext(c, updateDeletedAtMatchQuery, userId, matchId).Scan(&deletedMatchId, &deletedAt)
 	if err == sql.ErrNoRows {
 		return "", time.Time{}, domain.ErrNotFound
 	}

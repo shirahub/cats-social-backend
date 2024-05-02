@@ -3,6 +3,7 @@ package service
 import (
 	"app/domain"
 	"app/port"
+	"context"
 	"time"
 )
 
@@ -14,8 +15,8 @@ func NewCatMatchService(repo port.CatMatchRepository) *catMatchSvc {
 	return &catMatchSvc{repo}
 }
 
-func (s *catMatchSvc) Create(catMatch *domain.CatMatch) (*domain.CatMatch, error) {
-	return s.repo.Create(catMatch)
+func (s *catMatchSvc) Create(c context.Context, catMatch *domain.CatMatch) (*domain.CatMatch, error) {
+	return s.repo.Create(c, catMatch)
 }
 
 func (s *catMatchSvc) List() ([]domain.CatMatch, error) {
@@ -46,8 +47,8 @@ func (s *catMatchSvc) Reject(matchId string, userId string) (id string, updatedA
 	return id, updatedAt, err
 }
 
-func (s *catMatchSvc) Delete(catMatchId string, userId string) (string, time.Time, error) {
-	matchId, deletedAt, err := s.repo.Delete(userId, catMatchId)
+func (s *catMatchSvc) Delete(c context.Context, catMatchId string, userId string) (string, time.Time, error) {
+	matchId, deletedAt, err := s.repo.Delete(c, userId, catMatchId)
 	if err == domain.ErrNotFound {
 		_, err = s.repo.GetIssuedByIdUserId(catMatchId, userId)
 		if err == domain.ErrNotFound {
