@@ -106,18 +106,24 @@ func (r *CatMatchRepo) GetReceivedByIdUserId(matchId string, userId string) (*do
 	return &match, err
 }
 
-func (r *CatMatchRepo) UpdateStatus(matchId string, userId string, status string) (string, time.Time, error) {
+func (r *CatMatchRepo) ApproveAndInvalidateOthers(matchId string, userId string) (string, time.Time, error) {
 	var updatedMatchId string
 	var updatedAt time.Time
-	err := r.db.QueryRow(updateStatusMatchQuery, status, userId, matchId).Scan(&updatedMatchId, &updatedAt)
+	err := r.db.QueryRow(updateStatusMatchQuery, "approved", userId, matchId).Scan(&updatedMatchId, &updatedAt)
 	if err == sql.ErrNoRows {
 		return "", time.Time{}, domain.ErrNotFound
 	}
 	return updatedMatchId, updatedAt, err
 }
 
-func (r *CatMatchRepo) Invalidate(cat1Id string, cat2Id string) error {
-	return nil
+func (r *CatMatchRepo) Reject(matchId string, userId string) (string, time.Time, error) {
+	var updatedMatchId string
+	var updatedAt time.Time
+	err := r.db.QueryRow(updateStatusMatchQuery, "rejected", userId, matchId).Scan(&updatedMatchId, &updatedAt)
+	if err == sql.ErrNoRows {
+		return "", time.Time{}, domain.ErrNotFound
+	}
+	return updatedMatchId, updatedAt, err
 }
 
 func (r *CatMatchRepo) Delete(matchId string, userId string) (string, time.Time, error) {

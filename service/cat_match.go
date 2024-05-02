@@ -23,7 +23,7 @@ func (s *catMatchSvc) List() ([]domain.CatMatch, error) {
 }
 
 func (s *catMatchSvc) Approve(matchId string, userId string) (id string, updatedAt time.Time, err error) {
-	id, updatedAt, err = s.repo.UpdateStatus(matchId, userId, "approved")
+	id, updatedAt, err = s.repo.ApproveAndInvalidateOthers(matchId, userId)
 	if err == domain.ErrNotFound {
 		_, err = s.repo.GetReceivedByIdUserId(matchId, userId)
 		if err == domain.ErrNotFound {
@@ -35,7 +35,7 @@ func (s *catMatchSvc) Approve(matchId string, userId string) (id string, updated
 }
 
 func (s *catMatchSvc) Reject(matchId string, userId string) (id string, updatedAt time.Time, err error) {
-	id, updatedAt, err = s.repo.UpdateStatus(matchId, userId, "rejected")
+	id, updatedAt, err = s.repo.Reject(matchId, userId)
 	if err == domain.ErrNotFound {
 		_, err = s.repo.GetReceivedByIdUserId(matchId, userId)
 		if err == domain.ErrNotFound {
