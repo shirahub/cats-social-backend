@@ -116,7 +116,7 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 		getReq.UserId = "1"
 	}
 
-	cats, err := h.svc.List(&getReq)
+	cats, err := h.svc.List(c.Context(), &getReq)
 
 	if err != nil {
 		return serverError(c, fiber.StatusInternalServerError, "", err)

@@ -19,8 +19,8 @@ func (h *catManagementSvc) Create(ctx context.Context, cat *domain.CreateCatRequ
 	return h.repo.Create(ctx, cat)
 }
 
-func (h *catManagementSvc) List(req *domain.GetCatsRequest) ([]domain.Cat, error) {
-	return h.repo.List(req)
+func (h *catManagementSvc) List(ctx context.Context, req *domain.GetCatsRequest) ([]domain.Cat, error) {
+	return h.repo.List(ctx, req)
 }
 
 func (h *catManagementSvc) Update(cat *domain.Cat) (*domain.Cat, error) {

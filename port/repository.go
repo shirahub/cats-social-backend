@@ -8,7 +8,7 @@ import (
 
 type CatRepository interface {
 	Create(context.Context, *domain.CreateCatRequest) (*domain.Cat, error)
-	List(*domain.GetCatsRequest) ([]domain.Cat, error)
+	List(context.Context, *domain.GetCatsRequest) ([]domain.Cat, error)
 	Update(*domain.Cat) (*domain.Cat, error)
 	Delete(catId string, userId string) (id string, deletedAt time.Time, err error)
 }

@@ -110,9 +110,9 @@ func formGetQuery(req *domain.GetCatsRequest) (string, []interface{}) {
 	return fullQuery, filterArgs
 }
 
-func (r *CatRepo) List(req *domain.GetCatsRequest) ([]domain.Cat, error) {
+func (r *CatRepo) List(c context.Context, req *domain.GetCatsRequest) ([]domain.Cat, error) {
 	query, filterArgs := formGetQuery(req)
-	rows, err := r.db.Query(query, filterArgs...)
+	rows, err := r.db.QueryContext(c, query, filterArgs...)
 	if err != nil {
 		return nil, err
 	}
