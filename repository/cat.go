@@ -127,7 +127,7 @@ func formGetQuery(req *domain.GetCatsRequest) (string, []interface{}) {
 	filterArgs = append(filterArgs, req.Limit)
 	paginationQuery.WriteString(fmt.Sprintf("LIMIT $%d", len(filterArgs)))
 	filterArgs = append(filterArgs, req.Offset)
-	paginationQuery.WriteString(fmt.Sprintf("OFFSET $%d", len(filterArgs)))
+	paginationQuery.WriteString(fmt.Sprintf(" OFFSET $%d", len(filterArgs)))
 
 	fullQuery = strings.Replace(fullQuery, "{{ pagination_query }}", paginationQuery.String(), 1)
 	return fullQuery, filterArgs

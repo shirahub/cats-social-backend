@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"app/domain"
 	"app/port"
 	"strconv"
@@ -27,8 +28,8 @@ type createUpdateCatRequest struct {
 
 type listCatsRequest struct {
 	Id         string
-	Limit      int    `validate:"gt=0"`
-	Offset     int
+	Limit      int    `validate:"gte=0"`
+	Offset     int    `validate:"gte=0"`
 	Race       string
 	Sex        string `validate:"omitempty,oneof=male female"`
 	HasMatched string `validate:"omitempty,boolean"`
@@ -73,16 +74,14 @@ func (h *catManagementHandler) Create(c *fiber.Ctx) error {
 func (h *catManagementHandler) List(c *fiber.Ctx) error {
 	queries := c.Queries()
 
-	limit := queries["limit"]
-	limitNum, err := strconv.Atoi(limit)
+	limitNum, err := strconv.Atoi(queries["limit"])
 	if err != nil {
-		return invalidInput(c, err)
+		limitNum = 5
 	}
 
-	offset := queries["offset"]
-	offsetNum, err := strconv.Atoi(offset)
+	offsetNum, err := strconv.Atoi(queries["offset"])
 	if err != nil {
-		return invalidInput(c, err)
+		offsetNum = 0
 	}
 
 	req := listCatsRequest{
@@ -119,6 +118,10 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 		if errs, ok := err.(validator.ValidationErrors); ok {
 			for _, fe := range errs {
 				switch fe.StructField() {
+				case "Limit":
+					getReq.Limit = 5
+				case "Offset":
+					getReq.Offset = 0
 				case "AgeInMonth":
 					getReq.AgeInMonth = ""
 				case "Sex":

@@ -42,7 +42,7 @@ func (h *catMatchHandler) Create(c *fiber.Ctx) error {
 		return serverError(c, err)
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "success",
 		"data": fiber.Map{
 			"id": newRecord.Id,

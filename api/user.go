@@ -9,7 +9,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2/log"
 )
 
 type userHandler struct {
@@ -61,7 +60,7 @@ func (h *userHandler) Register(c *fiber.Ctx) error {
 
 	err = h.repo.Create(domain.User{Email: user.Email, Name: user.Name, Password: hash})
 	if err != nil {
-		log.Error(err)
+		return serverError(c, err)
 	}
 
 	return c.JSON(fiber.Map{

@@ -37,7 +37,7 @@ func (h *userHandler) Login(c *fiber.Ctx) error {
 
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user_id"] = user.Id
-	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	claims["exp"] = time.Now().Add(time.Hour * 8).Unix()
 
 	t, err := token.SignedString([]byte(config.Config("JWT_SECRET")))
 	if err != nil {

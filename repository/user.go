@@ -3,6 +3,7 @@ package repository
 import (
 	"app/domain"
 	"database/sql"
+	"github.com/lib/pq"
 )
 
 type UserRepo struct {
@@ -18,6 +19,12 @@ func (r *UserRepo) Create(user domain.User) error {
 		"INSERT INTO users (email, name, password) VALUES ($1, $2, $3)",
 		user.Email, user.Name, user.Password,
 	)
+	if pqErr, ok := err.(*pq.Error); ok {
+		if pqErr.Code == "23505" {
+			return domain.ErrEmailTaken
+		}
+		return err
+	}
 	return err
 }
 
