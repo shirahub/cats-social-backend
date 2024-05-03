@@ -22,6 +22,17 @@ const createMatchQuery = `
 	RETURNING id, created_at
 `
 
+const getMatchesQuery = `
+	SELECT cat_matches.id, message, status, cat_matches.created_at, 
+	issuer_cats.id, issuer_cats.name, issuer_cats.sex,
+	receiver_cats.id, receiver_cats.name, receiver_cats.sex,
+	users.id as user_id, users.name, users.email, users.created_at
+	FROM cat_matches
+	JOIN cats as issuer_cats ON cat_matches.issuer_cat_id = issuer_cats.id
+	JOIN cats as receiver_cats ON cat_matches.receiver_cat_id = receiver_cats.id
+	JOIN users on issuer_cats.user_id = users.id
+`
+
 const getIssuedByIdUserIdQuery = `
 	SELECT cat_matches.id, message, issuer_cat_id, receiver_cat_id, status, cat_matches.created_at
 	FROM cat_matches
@@ -85,8 +96,31 @@ func (r *CatMatchRepo) Create(c context.Context, match *domain.CatMatch) (*domai
 	return match, err
 }
 
-func (r *CatMatchRepo) List() ([]domain.CatMatch, error) {
-	return nil, nil
+func (r *CatMatchRepo) List(c context.Context) ([]domain.CatMatchDetail, error) {
+	rows, err := r.db.QueryContext(c, getMatchesQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var matches = make([]domain.CatMatchDetail, 0)
+	for rows.Next() {
+		var md domain.CatMatchDetail
+		if err := rows.Scan(
+			&md.Id, &md.Message, &md.Status, &md.CatMatchCreatedAt,
+			&md.IssuerCat.Id, &md.IssuerCat.Name, &md.IssuerCat.Sex,
+			&md.ReceiverCat.Id, &md.ReceiverCat.Name, &md.ReceiverCat.Sex,
+			&md.UserId, &md.Name, &md.Email, &md.UserCreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		matches = append(matches, md)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return matches, err
 }
 
 func (r *CatMatchRepo) GetIssuedByIdUserId(matchId string, userId string) (*domain.CatMatch, error) {

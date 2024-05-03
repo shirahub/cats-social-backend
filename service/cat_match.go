@@ -19,8 +19,8 @@ func (s *catMatchSvc) Create(c context.Context, catMatch *domain.CatMatch) (*dom
 	return s.repo.Create(c, catMatch)
 }
 
-func (s *catMatchSvc) List() ([]domain.CatMatch, error) {
-	return nil, nil
+func (s *catMatchSvc) List(c context.Context) ([]domain.CatMatchDetail, error) {
+	return s.repo.List(c)
 }
 
 func (s *catMatchSvc) Approve(c context.Context, matchId string, userId string) (id string, updatedAt time.Time, err error) {

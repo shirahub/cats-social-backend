@@ -3,6 +3,7 @@ package api
 import (
 	"app/domain"
 	"app/port"
+	"time"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -50,9 +51,63 @@ func (h *catMatchHandler) Create(c *fiber.Ctx) error {
 	})
 }
 
+type userDetail struct {
+	Name string
+	Email string
+	CreatedAt time.Time
+}
+
+type catDetail struct {
+	Id string
+	Name string
+	Race string
+	Sex string
+	Description string
+	AgeInMonth int
+	ImageUrls []string
+	HasMatched bool
+	CreatedAt time.Time
+}
+
+type listMatchesResponse struct {
+	Id string
+	IssuedBy userDetail
+	MatchCatDetail catDetail
+	UserCatDetail catDetail
+	Message string
+	CreatedAt time.Time
+}
+
 func (h *catMatchHandler) List(c *fiber.Ctx) error {
+	matches, err := h.svc.List(c.Context())
+
+	if err != nil {
+		return serverError(c, fiber.StatusInternalServerError, "", err)
+	}
+
+	matchesResp := make([]listMatchesResponse, len(matches))
+	for i, m := range matches {
+		matchesResp[i] = listMatchesResponse{
+			Id: m.Id,
+			IssuedBy: userDetail{
+				Email: m.Email,
+			},
+			MatchCatDetail: catDetail{
+				Name: m.ReceiverCat.Name,
+				Race: m.ReceiverCat.Race,
+				Sex: m.ReceiverCat.Sex,
+				Description: m.ReceiverCat.Description,
+				AgeInMonth: m.ReceiverCat.AgeInMonth,
+				ImageUrls: m.ReceiverCat.ImageUrls,
+				HasMatched: m.ReceiverCat.HasMatched,
+				CreatedAt: m.ReceiverCat.CreatedAt,
+			},
+		}
+	}
+
 	return c.JSON(fiber.Map{
 		"message": "success",
+		"data": matchesResp,
 	})
 }
 
