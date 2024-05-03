@@ -14,6 +14,7 @@ var errorCodes = map[error]int{
 	domain.ErrMatchWithOwnedCat: fiber.StatusBadRequest,
 	domain.ErrMatchWithSameSex: fiber.StatusBadRequest,
 	domain.ErrMatchWithTaken: fiber.StatusBadRequest,
+	domain.ErrMatchExists: fiber.StatusBadRequest,
 }
 
 func serverError(c *fiber.Ctx, err error) error {

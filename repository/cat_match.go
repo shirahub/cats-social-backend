@@ -78,11 +78,14 @@ const updateStatusMatchQuery = `
 	UPDATE cat_matches
 	SET status = $1
 	FROM cats
+	JOIN cats as issuer_cats ON issuer_cats.id = issuer_cat_id
 	WHERE user_id = $2
 	AND receiver_cat_id = cats.id
 	AND cat_matches.id = $3
 	AND status = 'pending'
 	AND cat_matches.deleted_at is null
+	AND cats.deleted_at is null
+	AND issuer_cats.deleted_at is null
 	RETURNING cat_matches.id, issuer_cat_id, receiver_cat_id, cat_matches.updated_at
 `
 
