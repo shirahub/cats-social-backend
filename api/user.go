@@ -1,6 +1,7 @@
 package api
 
 import (
+	"app/config"
 	"app/domain"
 	"app/repository"
 	"github.com/gofiber/fiber/v2"
@@ -20,20 +21,12 @@ func NewUserHandler(repo *repository.UserRepo) *userHandler {
 }
 
 func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-
-func validToken(t *jwt.Token, id string) bool {
-	n, err := strconv.Atoi(id)
+	salt, err := strconv.Atoi(config.Config("BCRYPT_SALT"))
 	if err != nil {
-		return false
+		salt = 8
 	}
-
-	claims := t.Claims.(jwt.MapClaims)
-	uid := int(claims["user_id"].(float64))
-
-	return uid == n
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), salt)
+	return string(bytes), err
 }
 
 type registerRequest struct {
@@ -66,4 +59,10 @@ func (h *userHandler) Register(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "User registered successfully",
 	})
+}
+
+func getUserId(c *fiber.Ctx) string {
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	return claims["user_id"].(string)
 }

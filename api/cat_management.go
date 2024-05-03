@@ -54,7 +54,7 @@ func (h *catManagementHandler) Create(c *fiber.Ctx) error {
 		AgeInMonth:  req.AgeInMonth,
 		Description: req.Description,
 		ImageUrls:   req.ImageUrls,
-		UserId:      "1",
+		UserId:      getUserId(c),
 	}
 	newRecord, err := h.svc.Create(c.Context(), &cat)
 	if err != nil {

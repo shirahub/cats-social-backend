@@ -71,7 +71,6 @@ func (r *CatRepo) Create(ctx context.Context, cat *domain.CreateCatRequest) (*do
 		createCatQuery, cat.Name, cat.Race, cat.Sex, cat.AgeInMonth,
 		cat.Description, pq.Array(cat.ImageUrls), cat.UserId,
 	).Scan(&newRecord.Id, &newRecord.CreatedAt)
-	fmt.Println(err)
 	return &newRecord, err
 }
 
@@ -182,7 +181,6 @@ func (r *CatRepo) Delete(c context.Context, catId string, userId string) (string
 		c, updateDeletedAtQuery, userId, catId,
 	).Scan(&deletedCatId, &deletedAt)
 	if err != nil {
-		fmt.Println(err)
 		if err == sql.ErrNoRows {
 			return "", time.Time{}, domain.ErrNotFound
 		} else {

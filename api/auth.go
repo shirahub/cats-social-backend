@@ -3,7 +3,6 @@ package api
 import (
 	"app/config"
 	"time"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"

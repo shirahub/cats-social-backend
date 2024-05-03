@@ -1,6 +1,7 @@
 package api
 
 import (
+	"app/api/middleware"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/go-playground/validator/v10"
@@ -42,7 +43,7 @@ func (r *router) Setup(app *fiber.App) {
 	user.Post("/login", r.userHandler.Login)
 
 	cat := api.Group("/cat")
-	cat.Post("", r.catManagementHandler.Create)
+	cat.Post("", middleware.Protected(), r.catManagementHandler.Create)
 	cat.Get("", r.catManagementHandler.List)
 	cat.Put("/:id", r.catManagementHandler.Update)
 	cat.Delete("/:id", r.catManagementHandler.Delete)
