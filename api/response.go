@@ -9,6 +9,7 @@ import (
 var errorCodes = map[error]int{
 	domain.ErrNotFound: fiber.StatusNotFound,
 	domain.ErrEmailTaken: fiber.StatusConflict,
+	domain.ErrCatInMatch: fiber.StatusBadRequest,
 	domain.ErrMatchResponded: fiber.StatusBadRequest,
 	domain.ErrMatchWithOwnedCat: fiber.StatusBadRequest,
 	domain.ErrMatchWithSameSex: fiber.StatusBadRequest,

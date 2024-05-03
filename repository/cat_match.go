@@ -53,6 +53,21 @@ const getReceivedByIdUserIdQuery = `
 	WHERE cat_matches.id = $1 AND user_id = $2 AND cat_matches.deleted_at is null
 `
 
+const checkCatParticipationQuery = `
+	SELECT COUNT(*)
+	FROM cat_matches
+	WHERE issuer_cat_id = $1 OR receiver_cat_id = $1
+	AND deleted_at is null
+`
+
+const checkCatsParticipationQuery = `
+	SELECT COUNT(*)
+	FROM cat_matches
+	WHERE ((issuer_cat_id = $1 AND receiver_cat_id = $1)
+	OR (issuer_cat_id = $2 AND receiver_cat_id = $2))
+	AND deleted_at is null
+`
+
 const updateHasMatchedQuery = `
 	UPDATE cats
 	SET has_matched = true
@@ -155,6 +170,18 @@ func (r *CatMatchRepo) GetReceivedByIdUserId(matchId string, userId string) (*do
 		return nil, domain.ErrNotFound
 	}
 	return &match, err
+}
+
+func (r *CatMatchRepo) IsCatInAnyMatch(c context.Context, catId string) (bool, error) {
+	var count int
+	err := r.db.QueryRowContext(c, checkCatParticipationQuery, catId).Scan(&count)
+	return count > 0, err
+}
+
+func (r *CatMatchRepo) AnyMatchExists(c context.Context, cat1Id, cat2Id string) (bool, error) {
+	var count int
+	err := r.db.QueryRowContext(c, checkCatsParticipationQuery, cat1Id, cat2Id).Scan(&count)
+	return count > 0, err
 }
 
 func (r *CatMatchRepo) ApproveAndInvalidateOthers(c context.Context, matchId string, userId string) (string, time.Time, error) {

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"app/domain"
 	"app/port"
 	"strconv"

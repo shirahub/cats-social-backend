@@ -26,7 +26,7 @@ func main() {
 	catRepo := repository.NewCatRepo(dbConn)
 	matchRepo := repository.NewCatMatchRepo(dbConn)
 
-	catSvc := service.NewCatManagementService(catRepo)
+	catSvc := service.NewCatManagementService(catRepo, matchRepo)
 	catMatchSvc := service.NewCatMatchService(catRepo, matchRepo)
 
 	userHandler := api.NewUserHandler(userRepo)

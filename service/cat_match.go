@@ -37,6 +37,13 @@ func (s *catMatchSvc) Create(c context.Context, catMatch *domain.CatMatch) (*dom
 	if issuerCat.Sex == receiverCat.Sex {
 		return nil, domain.ErrMatchWithSameSex
 	}
+	anyMatchExists, err := s.mRepo.AnyMatchExists(c, catMatch.IssuerCatId, catMatch.ReceiverCatId)
+	if err != nil {
+		return nil, err
+	}
+	if anyMatchExists {
+		return nil, domain.ErrMatchExists
+	}
 
 	return s.mRepo.Create(c, catMatch)
 }
