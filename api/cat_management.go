@@ -138,7 +138,7 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 		return serverError(c, err)
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "success",
 		"data":    cats,
 	})

@@ -15,8 +15,19 @@ func CheckPasswordHash(password, hash string) bool {
 }
 
 type loginRequest struct {
-	Email    string `json:"email"`
+	Email    string `json:"email",validate:"required,email"`
 	Password string `json:"password"`
+}
+
+func getToken(userId string) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	claims := token.Claims.(jwt.MapClaims)
+	claims["user_id"] = userId
+	claims["exp"] = time.Now().Add(time.Hour * 8).Unix()
+
+	t, err := token.SignedString([]byte(config.Config("JWT_SECRET")))
+	return t, err
 }
 
 func (h *userHandler) Login(c *fiber.Ctx) error {
@@ -32,15 +43,9 @@ func (h *userHandler) Login(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Invalid identity or password", "data": nil})
 	}
 
-	token := jwt.New(jwt.SigningMethodHS256)
-
-	claims := token.Claims.(jwt.MapClaims)
-	claims["user_id"] = user.Id
-	claims["exp"] = time.Now().Add(time.Hour * 8).Unix()
-
-	t, err := token.SignedString([]byte(config.Config("JWT_SECRET")))
+	t, err := getToken(user.Id)
 	if err != nil {
-		return c.SendStatus(fiber.StatusInternalServerError)
+		return serverError(c, err)
 	}
 
 	return c.JSON(fiber.Map{

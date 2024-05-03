@@ -36,7 +36,7 @@ func customError(c *fiber.Ctx, statusCode int, message string, err error) error 
 }
 
 func failedToParseInput(c *fiber.Ctx, err error) error {
-	return customError(c, fiber.StatusInternalServerError, "Failed to parse input", err)
+	return customError(c, fiber.StatusBadRequest, "Failed to parse input", err)
 }
 
 func invalidInput(c *fiber.Ctx, err error) error {

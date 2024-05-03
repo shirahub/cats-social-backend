@@ -14,18 +14,19 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 	return &UserRepo{db}
 }
 
-func (r *UserRepo) Create(user domain.User) error {
-	_, err := r.db.Exec(
-		"INSERT INTO users (email, name, password) VALUES ($1, $2, $3)",
+func (r *UserRepo) Create(user domain.User) (string, error) {
+	var userId string
+	err := r.db.QueryRow(
+		"INSERT INTO users (email, name, password) VALUES ($1, $2, $3) RETURNING id",
 		user.Email, user.Name, user.Password,
-	)
+	).Scan(&userId)
 	if pqErr, ok := err.(*pq.Error); ok {
 		if pqErr.Code == "23505" {
-			return domain.ErrEmailTaken
+			return "", domain.ErrEmailTaken
 		}
-		return err
+		return "", err
 	}
-	return err
+	return userId, nil
 }
 
 func (r *UserRepo) FindByEmail(email string) (*domain.User, error) {
