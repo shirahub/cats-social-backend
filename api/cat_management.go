@@ -22,7 +22,7 @@ type createUpdateCatRequest struct {
 	Sex         string   `validate:"oneof=male female"`
 	AgeInMonth  int      `validate:"min=1,max=120082"`
 	Description string   `validate:"min=1,max=200"`
-	ImageUrls   []string `validate:"min=1,max=10"`
+	ImageUrls   []string `validate:"min=1,max=10,dive,url"`
 }
 
 type listCatsRequest struct {
