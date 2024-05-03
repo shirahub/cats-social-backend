@@ -26,6 +26,12 @@ const createCatQuery = `
 	RETURNING id, created_at
 `
 
+const getByIdQuery = `
+	SELECT id, sex, user_id, has_matched
+	FROM cats
+	WHERE id = $1 and deleted_at is null
+`
+
 const getQuery = `
 	SELECT id, name, race, sex, age_in_month, description, image_urls, user_id, has_matched, created_at
 	FROM cats
@@ -67,6 +73,19 @@ func (r *CatRepo) Create(ctx context.Context, cat *domain.CreateCatRequest) (*do
 	).Scan(&newRecord.Id, &newRecord.CreatedAt)
 	fmt.Println(err)
 	return &newRecord, err
+}
+
+func (r *CatRepo) GetById(c context.Context, id string) (*domain.Cat, error) {
+	var cat domain.Cat
+	err := r.db.QueryRowContext(c, getByIdQuery, id).
+		Scan(&cat.Id, &cat.Sex, &cat.UserId, &cat.HasMatched)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, domain.ErrNotFound
+		}
+		return nil, err
+	}
+	return &cat, nil
 }
 
 func formGetQuery(req *domain.GetCatsRequest) (string, []interface{}) {
