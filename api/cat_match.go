@@ -70,7 +70,7 @@ func (h *catMatchHandler) Approve(c *fiber.Ctx) error {
 		return invalidInput(c, err)
 	}
 
-	matchId, updatedAt, err := h.svc.Approve(req.MatchId, "1")
+	matchId, updatedAt, err := h.svc.Approve(c.Context(), req.MatchId, "1")
 	if err != nil {
 		if err == domain.ErrNotFound {
 			return serverError(c, fiber.StatusNotFound, "", err)

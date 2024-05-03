@@ -23,8 +23,8 @@ func (s *catMatchSvc) List() ([]domain.CatMatch, error) {
 	return nil, nil
 }
 
-func (s *catMatchSvc) Approve(matchId string, userId string) (id string, updatedAt time.Time, err error) {
-	id, updatedAt, err = s.repo.ApproveAndInvalidateOthers(matchId, userId)
+func (s *catMatchSvc) Approve(c context.Context, matchId string, userId string) (id string, updatedAt time.Time, err error) {
+	id, updatedAt, err = s.repo.ApproveAndInvalidateOthers(c, matchId, userId)
 	if err == domain.ErrNotFound {
 		_, err = s.repo.GetReceivedByIdUserId(matchId, userId)
 		if err == domain.ErrNotFound {
@@ -47,10 +47,10 @@ func (s *catMatchSvc) Reject(matchId string, userId string) (id string, updatedA
 	return id, updatedAt, err
 }
 
-func (s *catMatchSvc) Delete(c context.Context, catMatchId string, userId string) (string, time.Time, error) {
-	matchId, deletedAt, err := s.repo.Delete(c, userId, catMatchId)
+func (s *catMatchSvc) Delete(c context.Context, matchId string, userId string) (string, time.Time, error) {
+	matchId, deletedAt, err := s.repo.Delete(c, matchId, userId)
 	if err == domain.ErrNotFound {
-		_, err = s.repo.GetIssuedByIdUserId(catMatchId, userId)
+		_, err = s.repo.GetIssuedByIdUserId(matchId, userId)
 		if err == domain.ErrNotFound {
 			return "", time.Time{}, domain.ErrNotFound
 		}

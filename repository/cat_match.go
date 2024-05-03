@@ -36,6 +36,12 @@ const getReceivedByIdUserIdQuery = `
 	WHERE cat_matches.id = $1 AND user_id = $2 AND cat_matches.deleted_at is null
 `
 
+const updateHasMatchedQuery = `
+	UPDATE cats
+	SET has_matched = true
+	WHERE id IN ($1, $2)
+`
+
 const updateStatusMatchQuery = `
 	UPDATE cat_matches
 	SET status = $1
@@ -45,7 +51,7 @@ const updateStatusMatchQuery = `
 	AND cat_matches.id = $3
 	AND status = 'pending'
 	AND cat_matches.deleted_at is null
-	RETURNING cat_matches.id, cat_matches.updated_at
+	RETURNING cat_matches.id, issuer_cat_id, receiver_cat_id, cat_matches.updated_at
 `
 
 const invalidateMatchesQuery = `
@@ -107,20 +113,48 @@ func (r *CatMatchRepo) GetReceivedByIdUserId(matchId string, userId string) (*do
 	return &match, err
 }
 
-func (r *CatMatchRepo) ApproveAndInvalidateOthers(matchId string, userId string) (string, time.Time, error) {
-	var updatedMatchId string
+func (r *CatMatchRepo) ApproveAndInvalidateOthers(c context.Context, matchId string, userId string) (string, time.Time, error) {
+	var updatedMatchId, issuerCatId, receiverCatId string
 	var updatedAt time.Time
-	err := r.db.QueryRow(updateStatusMatchQuery, "approved", userId, matchId).Scan(&updatedMatchId, &updatedAt)
+
+	tx, err := r.db.BeginTx(c, nil)
+	if err != nil {
+			return "", time.Time{}, err
+	}
+	// Defer a rollback in case anything fails.
+	defer tx.Rollback()
+
+	err = tx.QueryRowContext(
+		c, updateStatusMatchQuery, "approved", userId, matchId,
+	).Scan(&updatedMatchId, &issuerCatId, &receiverCatId, &updatedAt)
 	if err == sql.ErrNoRows {
 		return "", time.Time{}, domain.ErrNotFound
 	}
+
+	_, err = tx.ExecContext(c, updateHasMatchedQuery, issuerCatId, receiverCatId)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	_, err = tx.ExecContext(c, invalidateMatchesQuery, issuerCatId, receiverCatId)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
 	return updatedMatchId, updatedAt, err
 }
 
 func (r *CatMatchRepo) Reject(matchId string, userId string) (string, time.Time, error) {
-	var updatedMatchId string
+	var updatedMatchId, issuerCatId, receiverCatId string
 	var updatedAt time.Time
-	err := r.db.QueryRow(updateStatusMatchQuery, "rejected", userId, matchId).Scan(&updatedMatchId, &updatedAt)
+	err := r.db.QueryRow(
+		updateStatusMatchQuery, "rejected", userId, matchId,
+	).Scan(&updatedMatchId, &issuerCatId, &receiverCatId, &updatedAt)
 	if err == sql.ErrNoRows {
 		return "", time.Time{}, domain.ErrNotFound
 	}
