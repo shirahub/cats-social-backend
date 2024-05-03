@@ -5,6 +5,7 @@ import (
 	"time"
 	"app/domain"
 	"database/sql"
+	"github.com/lib/pq"
 )
 
 type CatMatchRepo struct {
@@ -24,13 +25,18 @@ const createMatchQuery = `
 
 const getMatchesQuery = `
 	SELECT cat_matches.id, message, status, cat_matches.created_at, 
-	issuer_cats.id, issuer_cats.name, issuer_cats.sex,
-	receiver_cats.id, receiver_cats.name, receiver_cats.sex,
-	users.id as user_id, users.name, users.email, users.created_at
+	ic.id, ic.name, ic.race, ic.sex, ic.description,
+	ic.age_in_month, ic.image_urls, ic.has_matched, ic.created_at,
+	rc.id, rc.name, rc.race, rc.sex, rc.description,
+	rc.age_in_month, rc.image_urls, rc.has_matched, rc.created_at,
+	users.id, users.name, users.email, users.created_at
 	FROM cat_matches
-	JOIN cats as issuer_cats ON cat_matches.issuer_cat_id = issuer_cats.id
-	JOIN cats as receiver_cats ON cat_matches.receiver_cat_id = receiver_cats.id
-	JOIN users on issuer_cats.user_id = users.id
+	JOIN cats as ic ON cat_matches.issuer_cat_id = ic.id
+	JOIN cats as rc ON cat_matches.receiver_cat_id = rc.id
+	JOIN users on ic.user_id = users.id
+	WHERE cat_matches.deleted_at is null
+	AND ic.user_id = $1 OR rc.user_id = $1
+	ORDER BY cat_matches.created_at DESC
 `
 
 const getIssuedByIdUserIdQuery = `
@@ -96,8 +102,8 @@ func (r *CatMatchRepo) Create(c context.Context, match *domain.CatMatch) (*domai
 	return match, err
 }
 
-func (r *CatMatchRepo) List(c context.Context) ([]domain.CatMatchDetail, error) {
-	rows, err := r.db.QueryContext(c, getMatchesQuery)
+func (r *CatMatchRepo) List(c context.Context, userId string) ([]domain.CatMatchDetail, error) {
+	rows, err := r.db.QueryContext(c, getMatchesQuery, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -109,8 +115,12 @@ func (r *CatMatchRepo) List(c context.Context) ([]domain.CatMatchDetail, error) 
 		var md domain.CatMatchDetail
 		if err := rows.Scan(
 			&md.Id, &md.Message, &md.Status, &md.CatMatchCreatedAt,
-			&md.IssuerCat.Id, &md.IssuerCat.Name, &md.IssuerCat.Sex,
-			&md.ReceiverCat.Id, &md.ReceiverCat.Name, &md.ReceiverCat.Sex,
+			&md.IssuerCat.Id, &md.IssuerCat.Name, &md.IssuerCat.Race,
+			&md.IssuerCat.Sex, &md.IssuerCat.Description, &md.IssuerCat.AgeInMonth,
+			pq.Array(&md.IssuerCat.ImageUrls), &md.IssuerCat.HasMatched, &md.IssuerCat.CreatedAt,
+			&md.ReceiverCat.Id, &md.ReceiverCat.Name, &md.ReceiverCat.Race,
+			&md.ReceiverCat.Sex, &md.ReceiverCat.Description, &md.ReceiverCat.AgeInMonth,
+			pq.Array(&md.ReceiverCat.ImageUrls), &md.ReceiverCat.HasMatched, &md.ReceiverCat.CreatedAt,
 			&md.UserId, &md.Name, &md.Email, &md.UserCreatedAt,
 		); err != nil {
 			return nil, err

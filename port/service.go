@@ -15,7 +15,7 @@ type CatManagementService interface {
 
 type CatMatchService interface {
 	Create(context.Context, *domain.CatMatch) (*domain.CatMatch, error)
-	List(context.Context) ([]domain.CatMatchDetail, error)
+	List(c context.Context, userId string) ([]domain.CatMatchDetail, error)
 	Approve(c context.Context, matchId string, userId string) (id string, updatedAt time.Time, err error)
 	Reject(c context.Context, matchId string, userId string) (id string, updatedAt time.Time, err error)
 	Delete(c context.Context, matchId string, userId string) (id string, deletedAt time.Time, err error)

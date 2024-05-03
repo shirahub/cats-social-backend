@@ -79,7 +79,7 @@ type listMatchesResponse struct {
 }
 
 func (h *catMatchHandler) List(c *fiber.Ctx) error {
-	matches, err := h.svc.List(c.Context())
+	matches, err := h.svc.List(c.Context(), "1")
 
 	if err != nil {
 		return serverError(c, fiber.StatusInternalServerError, "", err)
@@ -90,9 +90,12 @@ func (h *catMatchHandler) List(c *fiber.Ctx) error {
 		matchesResp[i] = listMatchesResponse{
 			Id: m.Id,
 			IssuedBy: userDetail{
-				Email: m.Email,
+				Name:      m.Name,
+				Email:     m.Email,
+				CreatedAt: m.UserCreatedAt,
 			},
 			MatchCatDetail: catDetail{
+				Id: m.ReceiverCat.Id,
 				Name: m.ReceiverCat.Name,
 				Race: m.ReceiverCat.Race,
 				Sex: m.ReceiverCat.Sex,
@@ -102,6 +105,19 @@ func (h *catMatchHandler) List(c *fiber.Ctx) error {
 				HasMatched: m.ReceiverCat.HasMatched,
 				CreatedAt: m.ReceiverCat.CreatedAt,
 			},
+			UserCatDetail: catDetail{
+				Id: m.IssuerCat.Id,
+				Name: m.IssuerCat.Name,
+				Race: m.IssuerCat.Race,
+				Sex: m.IssuerCat.Sex,
+				Description: m.IssuerCat.Description,
+				AgeInMonth: m.IssuerCat.AgeInMonth,
+				ImageUrls: m.IssuerCat.ImageUrls,
+				HasMatched: m.IssuerCat.HasMatched,
+				CreatedAt: m.IssuerCat.CreatedAt,
+			},
+			Message: m.Message,
+			CreatedAt: m.CatMatchCreatedAt,
 		}
 	}
 
