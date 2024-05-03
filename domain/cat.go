@@ -11,6 +11,7 @@ type Cat struct {
 	Description string    `json:"description"`
 	ImageUrls   []string  `json:"imageUrls"`
 	UserId      string    `json:"userId"`
+	HasMatched  bool      `json:"hasMatched"`
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"-"`
 }

@@ -27,7 +27,7 @@ const createCatQuery = `
 `
 
 const getQuery = `
-	SELECT id, name, race, sex, age_in_month, description, image_urls, user_id, created_at
+	SELECT id, name, race, sex, age_in_month, description, image_urls, user_id, has_matched, created_at
 	FROM cats
 	WHERE deleted_at is null
 	{{ where_query }}
@@ -124,7 +124,7 @@ func (r *CatRepo) List(c context.Context, req *domain.GetCatsRequest) ([]domain.
 		var cat domain.Cat
 		if err := rows.Scan(
 			&cat.Id, &cat.Name, &cat.Race, &cat.Sex, &cat.AgeInMonth, &cat.Description,
-			pq.Array(&cat.ImageUrls), &cat.UserId, &cat.CreatedAt,
+			pq.Array(&cat.ImageUrls), &cat.UserId, &cat.HasMatched, &cat.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
