@@ -168,15 +168,8 @@ func (h *catManagementHandler) Update(c *fiber.Ctx) error {
 	}
 
 	updatedRecord, err := h.svc.Update(c.Context(), &cat)
-
 	if err != nil {
-		if err == domain.ErrNotFound {
-			return serverError(c, err)
-		}
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "error",
-			"errors": err.Error(),
-		})
+		return serverError(c, err)
 	}
 
 	return c.JSON(fiber.Map{
