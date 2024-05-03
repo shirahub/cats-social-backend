@@ -5,6 +5,7 @@ import (
 	"app/port"
 	"strconv"
 	"github.com/gofiber/fiber/v2"
+	"github.com/go-playground/validator/v10"
 )
 
 type catManagementHandler struct {
@@ -96,12 +97,6 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 		Name:       queries["search"],
 	}
 
-	if err := validate.Struct(req); err != nil {
-		return invalidInput(c, err)
-	}
-
-	ownedBool, _ := strconv.ParseBool(req.Owned)
-
 	getReq := domain.GetCatsRequest{
 		Id:         req.Id,
 		Limit:      req.Limit,
@@ -112,8 +107,27 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 		Name:       req.Name,
 	}
 
+	ownedBool, _ := strconv.ParseBool(req.Owned)
 	if ownedBool {
 		getReq.UserId = "1"
+	}
+
+	matchedBool, _ := strconv.ParseBool(req.HasMatched)
+	getReq.HasMatched = &matchedBool
+
+	if err := validate.Struct(req); err != nil {
+		if errs, ok := err.(validator.ValidationErrors); ok {
+			for _, fe := range errs {
+				switch fe.StructField() {
+				case "AgeInMonth":
+					getReq.AgeInMonth = ""
+				case "Sex":
+					getReq.Sex = ""
+				case "HasMatched":
+					getReq.HasMatched = nil
+				}
+			}
+		}
 	}
 
 	cats, err := h.svc.List(c.Context(), &getReq)

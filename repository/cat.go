@@ -103,6 +103,10 @@ func formGetQuery(req *domain.GetCatsRequest) (string, []interface{}) {
 		filterArgs = append(filterArgs, req.Sex)
 		whereQuery.WriteString(fmt.Sprintf(" AND sex = $%d", len(filterArgs)))
 	}
+	if req.HasMatched != nil {
+		filterArgs = append(filterArgs, req.HasMatched)
+		whereQuery.WriteString(fmt.Sprintf(" AND has_matched = $%d", len(filterArgs)))
+	}
 	if req.AgeInMonth != "" {
 		re := regexp.MustCompile(comparisonPattern)
 		matches := re.FindStringSubmatch(req.AgeInMonth)
