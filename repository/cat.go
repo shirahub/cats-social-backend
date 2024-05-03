@@ -122,9 +122,13 @@ func formGetQuery(req *domain.GetCatsRequest) (string, []interface{}) {
 		filterArgs = append(filterArgs, matches[2])
 		whereQuery.WriteString(fmt.Sprintf(" AND age_in_month %s $%d", matches[1], len(filterArgs)))
 	}
-	if req.UserId != "" {
+	if req.UserId != "" && req.Owned != nil {
 		filterArgs = append(filterArgs, req.UserId)
-		whereQuery.WriteString(fmt.Sprintf(" AND user_id = $%d", len(filterArgs)))
+		if *req.Owned {
+			whereQuery.WriteString(fmt.Sprintf(" AND user_id = $%d", len(filterArgs)))
+		} else {
+			whereQuery.WriteString(fmt.Sprintf(" AND user_id != $%d", len(filterArgs)))
+		}
 	}
 	if req.Name != "" {
 		filterArgs = append(filterArgs, req.Name)

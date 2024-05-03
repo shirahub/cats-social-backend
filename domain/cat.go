@@ -35,5 +35,6 @@ type GetCatsRequest struct {
 	HasMatched *bool
 	AgeInMonth string
 	UserId     string
+	Owned      *bool
 	Name       string
 }

@@ -82,7 +82,6 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 	if err != nil {
 		offsetNum = 0
 	}
-
 	req := listCatsRequest{
 		Id:         queries["id"],
 		Limit: 		  limitNum,
@@ -94,6 +93,7 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 		Owned:      queries["owned"],
 		Name:       queries["search"],
 	}
+	
 
 	getReq := domain.GetCatsRequest{
 		Id:         req.Id,
@@ -103,11 +103,12 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 		Sex:        req.Sex,
 		AgeInMonth: req.AgeInMonth,
 		Name:       req.Name,
+		UserId:     getUserId(c),
 	}
 
-	ownedBool, _ := strconv.ParseBool(req.Owned)
-	if ownedBool {
-		getReq.UserId = getUserId(c)
+	ownedBool, err := strconv.ParseBool(req.Owned)
+	if err == nil {
+		getReq.Owned = &ownedBool
 	}
 
 	matchedBool, err := strconv.ParseBool(req.HasMatched)
@@ -127,8 +128,6 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 					getReq.AgeInMonth = ""
 				case "Sex":
 					getReq.Sex = ""
-				case "HasMatched":
-					getReq.HasMatched = nil
 				}
 			}
 		}

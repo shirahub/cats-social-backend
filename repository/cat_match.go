@@ -63,8 +63,8 @@ const checkCatParticipationQuery = `
 const checkCatsParticipationQuery = `
 	SELECT COUNT(*)
 	FROM cat_matches
-	WHERE ((issuer_cat_id = $1 AND receiver_cat_id = $1)
-	OR (issuer_cat_id = $2 AND receiver_cat_id = $2))
+	WHERE ((issuer_cat_id = $1 AND receiver_cat_id = $2)
+	OR (issuer_cat_id = $2 AND receiver_cat_id = $1))
 	AND deleted_at is null
 `
 
