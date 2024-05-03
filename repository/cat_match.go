@@ -149,11 +149,11 @@ func (r *CatMatchRepo) ApproveAndInvalidateOthers(c context.Context, matchId str
 	return updatedMatchId, updatedAt, err
 }
 
-func (r *CatMatchRepo) Reject(matchId string, userId string) (string, time.Time, error) {
+func (r *CatMatchRepo) Reject(c context.Context, matchId string, userId string) (string, time.Time, error) {
 	var updatedMatchId, issuerCatId, receiverCatId string
 	var updatedAt time.Time
-	err := r.db.QueryRow(
-		updateStatusMatchQuery, "rejected", userId, matchId,
+	err := r.db.QueryRowContext(
+		c, updateStatusMatchQuery, "rejected", userId, matchId,
 	).Scan(&updatedMatchId, &issuerCatId, &receiverCatId, &updatedAt)
 	if err == sql.ErrNoRows {
 		return "", time.Time{}, domain.ErrNotFound

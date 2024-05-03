@@ -99,7 +99,7 @@ func (h *catMatchHandler) Reject(c *fiber.Ctx) error {
 		return invalidInput(c, err)
 	}
 
-	matchId, updatedAt, err := h.svc.Reject(req.MatchId, "1")
+	matchId, updatedAt, err := h.svc.Reject(c.Context(), req.MatchId, "1")
 	if err != nil {
 		if err == domain.ErrNotFound {
 			return serverError(c, fiber.StatusNotFound, "", err)

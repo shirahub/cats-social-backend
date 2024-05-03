@@ -19,6 +19,6 @@ type CatMatchRepository interface {
 	GetIssuedByIdUserId(matchId string, userId string) (*domain.CatMatch, error)
 	GetReceivedByIdUserId(matchId string, userId string) (*domain.CatMatch, error)
 	ApproveAndInvalidateOthers(c context.Context, matchId string, receiverUserId string) (id string, updatedAt time.Time, err error)
-	Reject(matchId string, receiverUserId string) (id string, updatedAt time.Time, err error)
+	Reject(c context.Context, matchId string, receiverUserId string) (id string, updatedAt time.Time, err error)
 	Delete(c context.Context, matchId string, userId string) (id string, deletedAt time.Time, err error)
 }

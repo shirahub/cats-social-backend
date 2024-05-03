@@ -35,8 +35,8 @@ func (s *catMatchSvc) Approve(c context.Context, matchId string, userId string) 
 	return id, updatedAt, err
 }
 
-func (s *catMatchSvc) Reject(matchId string, userId string) (id string, updatedAt time.Time, err error) {
-	id, updatedAt, err = s.repo.Reject(matchId, userId)
+func (s *catMatchSvc) Reject(c context.Context, matchId string, userId string) (id string, updatedAt time.Time, err error) {
+	id, updatedAt, err = s.repo.Reject(c, matchId, userId)
 	if err == domain.ErrNotFound {
 		_, err = s.repo.GetReceivedByIdUserId(matchId, userId)
 		if err == domain.ErrNotFound {
