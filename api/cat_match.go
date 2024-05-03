@@ -52,30 +52,30 @@ func (h *catMatchHandler) Create(c *fiber.Ctx) error {
 }
 
 type userDetail struct {
-	Name string
-	Email string
-	CreatedAt time.Time
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type catDetail struct {
-	Id string
-	Name string
-	Race string
-	Sex string
-	Description string
-	AgeInMonth int
-	ImageUrls []string
-	HasMatched bool
-	CreatedAt time.Time
+	Id          string    `json:"id"`
+	Name        string    `json:"name"`
+	Race        string    `json:"race"`
+	Sex         string    `json:"sex"`
+	Description string    `json:"description"`
+	AgeInMonth  int       `json:"ageInMonth"`
+	ImageUrls   []string  `json:"imageUrls"`
+	HasMatched  bool      `json:"hasMatched"`
+	CreatedAt   time.Time `json:"createdAt"`
 }
 
 type listMatchesResponse struct {
-	Id string
-	IssuedBy userDetail
-	MatchCatDetail catDetail
-	UserCatDetail catDetail
-	Message string
-	CreatedAt time.Time
+	Id             string     `json:"id"`
+	IssuedBy       userDetail `json:"issuedBy"`
+	MatchCatDetail catDetail  `json:"matchCatDetail"`
+	UserCatDetail  catDetail  `json:"userCatDetail"`
+	Message        string     `json:"message"`
+	CreatedAt      time.Time  `json:"createdAt"`
 }
 
 func (h *catMatchHandler) List(c *fiber.Ctx) error {
