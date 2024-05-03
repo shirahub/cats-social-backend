@@ -16,10 +16,13 @@ func NewCatMatchService(catRepo port.CatRepository, matchRepo port.CatMatchRepos
 	return &catMatchSvc{catRepo, matchRepo}
 }
 
-func (s *catMatchSvc) Create(c context.Context, catMatch *domain.CatMatch) (*domain.CatMatch, error) {
+func (s *catMatchSvc) Create(c context.Context, catMatch *domain.CatMatch, userId string) (*domain.CatMatch, error) {
 	issuerCat, err := s.cRepo.GetById(c, catMatch.IssuerCatId)
 	if err != nil {
 		return nil, err
+	}
+	if issuerCat.UserId != userId {
+		return nil, domain.ErrNotFound
 	}
 	if issuerCat.HasMatched {
 		return nil, domain.ErrMatchWithTaken

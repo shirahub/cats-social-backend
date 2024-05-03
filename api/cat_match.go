@@ -16,8 +16,8 @@ func NewCatMatchHandler(svc port.CatMatchService) *catMatchHandler {
 }
 
 type createMatchRequest struct {
-	MatchCatId string
-	UserCatId  string
+	MatchCatId string `validate:"required"`
+	UserCatId  string `validate:"required"`
 	Message    string `validate:"min=5,max=120"`
 }
 
@@ -37,7 +37,7 @@ func (h *catMatchHandler) Create(c *fiber.Ctx) error {
 		Message: req.Message,
 	}
 
-	newRecord, err := h.svc.Create(c.Context(), &match)
+	newRecord, err := h.svc.Create(c.Context(), &match, getUserId(c))
 	if err != nil {
 		return serverError(c, err)
 	}

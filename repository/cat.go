@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"strconv"
 	"database/sql"
 	"github.com/lib/pq"
 )
@@ -57,6 +58,11 @@ const updateDeletedAtQuery = `
 
 const comparisonPattern = `^([<>]=?|=)\s*(\d+)$`
 
+func isValidId(id string) bool {
+	_, err := strconv.ParseInt(id, 10, 64)
+	return err == nil
+}
+
 func (r *CatRepo) Create(ctx context.Context, cat *domain.CreateCatRequest) (*domain.Cat, error) {
 	newRecord := domain.Cat{
 		Name: cat.Name,
@@ -75,6 +81,10 @@ func (r *CatRepo) Create(ctx context.Context, cat *domain.CreateCatRequest) (*do
 }
 
 func (r *CatRepo) GetById(c context.Context, id string) (*domain.Cat, error) {
+	if !isValidId(id) {
+		return nil, domain.ErrNotFound
+	}
+
 	var cat domain.Cat
 	err := r.db.QueryRowContext(c, getByIdQuery, id).
 		Scan(&cat.Id, &cat.Sex, &cat.UserId, &cat.HasMatched)
@@ -133,6 +143,13 @@ func formGetQuery(req *domain.GetCatsRequest) (string, []interface{}) {
 }
 
 func (r *CatRepo) List(c context.Context, req *domain.GetCatsRequest) ([]domain.Cat, error) {
+	var cats = make([]domain.Cat, 0)
+	if req.UserId != "" {
+		if !isValidId(req.UserId) {
+			return nil, domain.ErrNotFound
+		}
+	}
+	
 	query, filterArgs := formGetQuery(req)
 	rows, err := r.db.QueryContext(c, query, filterArgs...)
 	if err != nil {
@@ -140,8 +157,6 @@ func (r *CatRepo) List(c context.Context, req *domain.GetCatsRequest) ([]domain.
 	}
 
 	defer rows.Close()
-
-	var cats = make([]domain.Cat, 0)
 	for rows.Next() {
 		var cat domain.Cat
 		if err := rows.Scan(
@@ -159,6 +174,9 @@ func (r *CatRepo) List(c context.Context, req *domain.GetCatsRequest) ([]domain.
 }
 
 func (r *CatRepo) Update(c context.Context, cat *domain.Cat) (*domain.Cat, error) {
+	if !isValidId(cat.Id) || !isValidId(cat.UserId) {
+		return nil, domain.ErrNotFound
+	}
 	err := r.db.QueryRowContext(
 		c, updateQuery,
 		cat.Name, cat.Race, cat.Sex, cat.AgeInMonth, cat.Description, pq.Array(cat.ImageUrls),
@@ -175,6 +193,10 @@ func (r *CatRepo) Update(c context.Context, cat *domain.Cat) (*domain.Cat, error
 }
 
 func (r *CatRepo) Delete(c context.Context, catId string, userId string) (string, time.Time, error) {
+	if !isValidId(catId) || !isValidId(userId) {
+		return "", time.Time{}, domain.ErrNotFound
+	}
+
 	var deletedCatId string
 	var deletedAt time.Time
 	err := r.db.QueryRowContext(

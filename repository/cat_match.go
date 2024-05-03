@@ -121,6 +121,10 @@ func (r *CatMatchRepo) Create(c context.Context, match *domain.CatMatch) (*domai
 }
 
 func (r *CatMatchRepo) List(c context.Context, userId string) ([]domain.CatMatchDetail, error) {
+	if !isValidId(userId) {
+		return nil, domain.ErrNotFound
+	}
+
 	rows, err := r.db.QueryContext(c, getMatchesQuery, userId)
 	if err != nil {
 		return nil, err
@@ -152,6 +156,10 @@ func (r *CatMatchRepo) List(c context.Context, userId string) ([]domain.CatMatch
 }
 
 func (r *CatMatchRepo) GetIssuedByIdUserId(matchId string, userId string) (*domain.CatMatch, error) {
+	if !isValidId(matchId) || !isValidId(userId) {
+		return nil, domain.ErrNotFound
+	}
+
 	var match domain.CatMatch
 	err := r.db.QueryRow(
 		getIssuedByIdUserIdQuery,
@@ -164,6 +172,10 @@ func (r *CatMatchRepo) GetIssuedByIdUserId(matchId string, userId string) (*doma
 }
 
 func (r *CatMatchRepo) GetReceivedByIdUserId(matchId string, userId string) (*domain.CatMatch, error) {
+	if !isValidId(matchId) || !isValidId(userId) {
+		return nil, domain.ErrNotFound
+	}
+
 	var match domain.CatMatch
 	err := r.db.QueryRow(
 		getReceivedByIdUserIdQuery,
@@ -176,18 +188,30 @@ func (r *CatMatchRepo) GetReceivedByIdUserId(matchId string, userId string) (*do
 }
 
 func (r *CatMatchRepo) IsCatInAnyMatch(c context.Context, catId string) (bool, error) {
+	if !isValidId(catId) {
+		return false, nil
+	}
+
 	var count int
 	err := r.db.QueryRowContext(c, checkCatParticipationQuery, catId).Scan(&count)
 	return count > 0, err
 }
 
 func (r *CatMatchRepo) AnyMatchExists(c context.Context, cat1Id, cat2Id string) (bool, error) {
+	if !isValidId(cat1Id) || !isValidId(cat2Id) {
+		return false, nil
+	}
+
 	var count int
 	err := r.db.QueryRowContext(c, checkCatsParticipationQuery, cat1Id, cat2Id).Scan(&count)
 	return count > 0, err
 }
 
 func (r *CatMatchRepo) ApproveAndInvalidateOthers(c context.Context, matchId string, userId string) (string, time.Time, error) {
+	if !isValidId(matchId) || !isValidId(userId) {
+		return "", time.Time{}, domain.ErrNotFound
+	}
+
 	var updatedMatchId, issuerCatId, receiverCatId string
 	var updatedAt time.Time
 
@@ -224,6 +248,10 @@ func (r *CatMatchRepo) ApproveAndInvalidateOthers(c context.Context, matchId str
 }
 
 func (r *CatMatchRepo) Reject(c context.Context, matchId string, userId string) (string, time.Time, error) {
+	if !isValidId(matchId) || !isValidId(userId) {
+		return "", time.Time{}, domain.ErrNotFound
+	}
+
 	var updatedMatchId, issuerCatId, receiverCatId string
 	var updatedAt time.Time
 	err := r.db.QueryRowContext(
@@ -236,6 +264,9 @@ func (r *CatMatchRepo) Reject(c context.Context, matchId string, userId string) 
 }
 
 func (r *CatMatchRepo) Delete(c context.Context, matchId string, userId string) (string, time.Time, error) {
+	if !isValidId(matchId) || !isValidId(userId) {
+		return "", time.Time{}, domain.ErrNotFound
+	}
 	var deletedMatchId string
 	var deletedAt time.Time
 	err := r.db.QueryRowContext(c, updateDeletedAtMatchQuery, userId, matchId).Scan(&deletedMatchId, &deletedAt)
