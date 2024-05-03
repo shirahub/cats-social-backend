@@ -15,8 +15,8 @@ func CheckPasswordHash(password, hash string) bool {
 }
 
 type loginRequest struct {
-	Email    string `json:"email",validate:"required,email"`
-	Password string `json:"password"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"min=5,max=15"`
 }
 
 func getToken(userId string) (string, error) {
@@ -34,13 +34,20 @@ func (h *userHandler) Login(c *fiber.Ctx) error {
 	input := new(loginRequest)
 
 	if err := c.BodyParser(input); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "Error on login request", "errors": err.Error()})
+		return failedToParseInput(c, err)
+	}
+
+	if err := validate.Struct(input); err != nil {
+		return invalidInput(c, err)
 	}
 
 	user, err := h.repo.FindByEmail(input.Email)
+	if err != nil {
+		return serverError(c, err)
+	}
 
 	if !CheckPasswordHash(input.Password, user.Password) {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Invalid identity or password", "data": nil})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "Invalid identity or password", "data": nil})
 	}
 
 	t, err := getToken(user.Id)
