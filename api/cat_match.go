@@ -39,7 +39,7 @@ func (h *catMatchHandler) Create(c *fiber.Ctx) error {
 
 	newRecord, err := h.svc.Create(c.Context(), &match)
 	if err != nil {
-		return serverError(c, fiber.StatusInternalServerError, "", err)
+		return serverError(c, err)
 	}
 
 	return c.JSON(fiber.Map{
@@ -82,7 +82,7 @@ func (h *catMatchHandler) List(c *fiber.Ctx) error {
 	matches, err := h.svc.List(c.Context(), "1")
 
 	if err != nil {
-		return serverError(c, fiber.StatusInternalServerError, "", err)
+		return serverError(c, err)
 	}
 
 	matchesResp := make([]listMatchesResponse, len(matches))
@@ -143,13 +143,7 @@ func (h *catMatchHandler) Approve(c *fiber.Ctx) error {
 
 	matchId, updatedAt, err := h.svc.Approve(c.Context(), req.MatchId, "1")
 	if err != nil {
-		if err == domain.ErrNotFound {
-			return serverError(c, fiber.StatusNotFound, "", err)
-		}
-		if err == domain.ErrMatchResponded {
-			return serverError(c, fiber.StatusBadRequest, "", err)
-		}
-		return serverError(c, fiber.StatusInternalServerError, "", err)
+		return serverError(c, err)
 	}
 	return c.JSON(fiber.Map{
 		"message": "success",
@@ -172,13 +166,7 @@ func (h *catMatchHandler) Reject(c *fiber.Ctx) error {
 
 	matchId, updatedAt, err := h.svc.Reject(c.Context(), req.MatchId, "1")
 	if err != nil {
-		if err == domain.ErrNotFound {
-			return serverError(c, fiber.StatusNotFound, "", err)
-		}
-		if err == domain.ErrMatchResponded {
-			return serverError(c, fiber.StatusBadRequest, "", err)
-		}
-		return serverError(c, fiber.StatusInternalServerError, "", err)
+		return serverError(c, err)
 	}
 	return c.JSON(fiber.Map{
 		"message": "success",
@@ -192,13 +180,7 @@ func (h *catMatchHandler) Reject(c *fiber.Ctx) error {
 func (h *catMatchHandler) Delete(c *fiber.Ctx) error {
 	id, deletedAt, err := h.svc.Delete(c.Context(), c.Params("id"), "1")
 	if err != nil {
-		if err == domain.ErrNotFound {
-			return serverError(c, fiber.StatusNotFound, "", err)
-		}
-		if err == domain.ErrMatchResponded {
-			return serverError(c, fiber.StatusBadRequest, "", err)
-		}
-		return serverError(c, fiber.StatusInternalServerError, "", err)
+		return serverError(c, err)
 	}
 
 	return c.JSON(fiber.Map{
