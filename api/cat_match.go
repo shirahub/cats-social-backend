@@ -79,7 +79,7 @@ type listMatchesResponse struct {
 }
 
 func (h *catMatchHandler) List(c *fiber.Ctx) error {
-	matches, err := h.svc.List(c.Context(), "1")
+	matches, err := h.svc.List(c.Context(), getUserId(c))
 
 	if err != nil {
 		return serverError(c, err)
@@ -141,7 +141,7 @@ func (h *catMatchHandler) Approve(c *fiber.Ctx) error {
 		return invalidInput(c, err)
 	}
 
-	matchId, updatedAt, err := h.svc.Approve(c.Context(), req.MatchId, "1")
+	matchId, updatedAt, err := h.svc.Approve(c.Context(), req.MatchId, getUserId(c))
 	if err != nil {
 		return serverError(c, err)
 	}
@@ -164,7 +164,7 @@ func (h *catMatchHandler) Reject(c *fiber.Ctx) error {
 		return invalidInput(c, err)
 	}
 
-	matchId, updatedAt, err := h.svc.Reject(c.Context(), req.MatchId, "1")
+	matchId, updatedAt, err := h.svc.Reject(c.Context(), req.MatchId, getUserId(c))
 	if err != nil {
 		return serverError(c, err)
 	}
@@ -178,7 +178,7 @@ func (h *catMatchHandler) Reject(c *fiber.Ctx) error {
 }
 
 func (h *catMatchHandler) Delete(c *fiber.Ctx) error {
-	id, deletedAt, err := h.svc.Delete(c.Context(), c.Params("id"), "1")
+	id, deletedAt, err := h.svc.Delete(c.Context(), c.Params("id"), getUserId(c))
 	if err != nil {
 		return serverError(c, err)
 	}

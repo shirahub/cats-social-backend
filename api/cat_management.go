@@ -107,7 +107,7 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 
 	ownedBool, _ := strconv.ParseBool(req.Owned)
 	if ownedBool {
-		getReq.UserId = "1"
+		getReq.UserId = getUserId(c)
 	}
 
 	matchedBool, _ := strconv.ParseBool(req.HasMatched)
@@ -162,7 +162,7 @@ func (h *catManagementHandler) Update(c *fiber.Ctx) error {
 		AgeInMonth:  req.AgeInMonth,
 		Description: req.Description,
 		ImageUrls:   req.ImageUrls,
-		UserId:      "1",
+		UserId:      getUserId(c),
 	}
 
 	updatedRecord, err := h.svc.Update(c.Context(), &cat)
@@ -187,7 +187,7 @@ func (h *catManagementHandler) Update(c *fiber.Ctx) error {
 }
 
 func (h *catManagementHandler) Delete(c *fiber.Ctx) error {
-	catId, deletedAt, err := h.svc.Delete(c.Context(), c.Params("id"), "1")
+	catId, deletedAt, err := h.svc.Delete(c.Context(), c.Params("id"), getUserId(c))
 	if err != nil {
 		if err == domain.ErrNotFound {
 			return serverError(c, err)

@@ -44,14 +44,14 @@ func (r *router) Setup(app *fiber.App) {
 
 	cat := api.Group("/cat")
 	cat.Post("", middleware.Protected(), r.catManagementHandler.Create)
-	cat.Get("", r.catManagementHandler.List)
-	cat.Put("/:id", r.catManagementHandler.Update)
-	cat.Delete("/:id", r.catManagementHandler.Delete)
+	cat.Get("", middleware.Protected(), r.catManagementHandler.List)
+	cat.Put("/:id", middleware.Protected(), r.catManagementHandler.Update)
+	cat.Delete("/:id", middleware.Protected(), r.catManagementHandler.Delete)
 
 	match := cat.Group("/match")
-	match.Post("", r.catMatchHandler.Create)
-	match.Get("", r.catMatchHandler.List)
-	match.Post("/approve", r.catMatchHandler.Approve)
-	match.Post("/reject", r.catMatchHandler.Reject)
-	match.Delete("/:id", r.catMatchHandler.Delete)
+	match.Post("", middleware.Protected(), r.catMatchHandler.Create)
+	match.Get("", middleware.Protected(), r.catMatchHandler.List)
+	match.Post("/approve", middleware.Protected(), r.catMatchHandler.Approve)
+	match.Post("/reject", middleware.Protected(), r.catMatchHandler.Reject)
+	match.Delete("/:id", middleware.Protected(), r.catMatchHandler.Delete)
 }
