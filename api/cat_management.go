@@ -110,8 +110,10 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 		getReq.UserId = getUserId(c)
 	}
 
-	matchedBool, _ := strconv.ParseBool(req.HasMatched)
-	getReq.HasMatched = &matchedBool
+	matchedBool, err := strconv.ParseBool(req.HasMatched)
+	if err == nil {
+		getReq.HasMatched = &matchedBool
+	}
 
 	if err := validate.Struct(req); err != nil {
 		if errs, ok := err.(validator.ValidationErrors); ok {
@@ -138,7 +140,7 @@ func (h *catManagementHandler) List(c *fiber.Ctx) error {
 		return serverError(c, err)
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+	return c.JSON(fiber.Map{
 		"message": "success",
 		"data":    cats,
 	})
