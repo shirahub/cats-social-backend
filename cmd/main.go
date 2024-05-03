@@ -1,6 +1,7 @@
 package main
 
 import (
+	"app/config"
 	"app/repository"
 	"app/service"
 	"app/api"
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+	config.LoadConfig(".env")
 	app := fiber.New(fiber.Config{
 		Prefork:       true,
 		CaseSensitive: true,
