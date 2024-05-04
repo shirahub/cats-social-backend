@@ -64,7 +64,8 @@ const getQuery = `
 
 const updateQuery = `
 	UPDATE cats
-	SET name = $1, race = $2, sex = $3, age_in_month = $4, description = $5, image_urls = $6
+	SET name = $1, race = $2, sex = $3, age_in_month = $4, description = $5,
+	image_urls = $6, updated_at = NOW()
 	WHERE user_id = $7 and id = $8 and deleted_at is null
 	RETURNING id, updated_at
 `

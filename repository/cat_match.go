@@ -70,13 +70,13 @@ const checkCatsParticipationQuery = `
 
 const updateHasMatchedQuery = `
 	UPDATE cats
-	SET has_matched = true
+	SET has_matched = true, updated_at = NOW()
 	WHERE id IN ($1, $2)
 `
 
 const updateStatusMatchQuery = `
 	UPDATE cat_matches as cm
-	SET status = $1
+	SET status = $1, updated_at = NOW()
 	FROM cat_matches as cm_d
 	INNER JOIN cats as ic ON ic.id = cm_d.issuer_cat_id
 	INNER JOIN cats as rc ON rc.id = cm_d.receiver_cat_id
@@ -92,7 +92,7 @@ const updateStatusMatchQuery = `
 
 const invalidateMatchesQuery = `
 	UPDATE cat_matches
-	SET status = 'invalid'
+	SET status = 'invalid', updated_at = NOW()
 	FROM cats
 	WHERE status = 'pending'
 	AND cat_matches.deleted_at is null
