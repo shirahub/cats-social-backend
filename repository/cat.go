@@ -33,6 +33,22 @@ const getByIdQuery = `
 	WHERE id = $1 and deleted_at is null
 `
 
+const hasMatchedQuery = `
+	AND has_matched = true OR id IN (
+		SELECT receiver_cat_id from cat_matches
+			join cats on cats.id = cat_matches.issuer_cat_id
+			where user_id = $%d
+		)
+`
+
+const hasNotMatchedQuery = `
+	AND has_matched = false AND id NOT IN (
+		SELECT receiver_cat_id from cat_matches
+			join cats on cats.id = cat_matches.issuer_cat_id
+			where user_id = $%d
+		)
+`
+
 const getQuery = `
 	SELECT id, name, race, sex, age_in_month, description, image_urls, user_id, has_matched, created_at
 	FROM cats
@@ -113,8 +129,12 @@ func formGetQuery(req *domain.GetCatsRequest) (string, []interface{}) {
 		whereQuery.WriteString(fmt.Sprintf(" AND sex = $%d", len(filterArgs)))
 	}
 	if req.HasMatched != nil {
-		filterArgs = append(filterArgs, req.HasMatched)
-		whereQuery.WriteString(fmt.Sprintf(" AND has_matched = $%d", len(filterArgs)))
+		filterArgs = append(filterArgs, req.UserId)
+		if *req.HasMatched {
+			whereQuery.WriteString(fmt.Sprintf(hasMatchedQuery, len(filterArgs)))
+		} else {
+			whereQuery.WriteString(fmt.Sprintf(hasNotMatchedQuery, len(filterArgs)))
+		}
 	}
 	if req.AgeInMonth != "" {
 		re := regexp.MustCompile(comparisonPattern)
