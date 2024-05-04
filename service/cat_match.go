@@ -41,7 +41,6 @@ func (s *catMatchSvc) Create(c context.Context, catMatch *domain.CatMatch, userI
 		return nil, domain.ErrMatchWithSameSex
 	}
 	// CHANGE OF REQUIREMENT
-	/*
 	anyMatchExists, err := s.mRepo.AnyMatchExists(c, catMatch.IssuerCatId, catMatch.ReceiverCatId)
 	if err != nil {
 		return nil, err
@@ -49,7 +48,6 @@ func (s *catMatchSvc) Create(c context.Context, catMatch *domain.CatMatch, userI
 	if anyMatchExists {
 		return nil, domain.ErrMatchExists
 	}
-	*/
 
 	return s.mRepo.Create(c, catMatch)
 }
