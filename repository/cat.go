@@ -36,16 +36,18 @@ const getByIdQuery = `
 const hasMatchedQuery = `
 	AND has_matched = true OR id IN (
 		SELECT receiver_cat_id from cat_matches
-			join cats on cats.id = cat_matches.issuer_cat_id
-			where user_id = $%d
+			JOIN cats ON cats.id = cat_matches.issuer_cat_id
+			WHERE user_id = $%d
+			AND cat_matches.deleted_at is null
 		)
 `
 
 const hasNotMatchedQuery = `
 	AND has_matched = false AND id NOT IN (
 		SELECT receiver_cat_id from cat_matches
-			join cats on cats.id = cat_matches.issuer_cat_id
-			where user_id = $%d
+			JOIN cats on cats.id = cat_matches.issuer_cat_id
+			WHERE user_id = $%d
+			AND cat_matches.deleted_at is null
 		)
 `
 
