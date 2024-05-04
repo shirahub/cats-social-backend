@@ -41,7 +41,7 @@ func (h *userHandler) Login(c *fiber.Ctx) error {
 		return invalidInput(c, err)
 	}
 
-	user, err := h.repo.FindByEmail(input.Email)
+	user, err := h.repo.FindByEmail(c.Context(), input.Email)
 	if err != nil {
 		return serverError(c, err)
 	}

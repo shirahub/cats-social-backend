@@ -51,7 +51,8 @@ func (h *userHandler) Register(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't hash password", "errors": err.Error()})
 	}
 
-	id, err := h.repo.Create(domain.User{Email: user.Email, Name: user.Name, Password: hash})
+	newUser := domain.User{Email: user.Email, Name: user.Name, Password: hash}
+	id, err := h.repo.Create(c.Context(), newUser)
 	if err != nil {
 		return serverError(c, err)
 	}
