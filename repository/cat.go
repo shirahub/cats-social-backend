@@ -39,6 +39,7 @@ const hasMatchedQuery = `
 			JOIN cats ON cats.id = cat_matches.issuer_cat_id
 			WHERE user_id = $%d
 			AND cat_matches.deleted_at is null
+			AND cats.deleted_at is null
 		)
 `
 
@@ -48,6 +49,7 @@ const hasNotMatchedQuery = `
 			JOIN cats on cats.id = cat_matches.issuer_cat_id
 			WHERE user_id = $%d
 			AND cat_matches.deleted_at is null
+			AND cats.deleted_at is null
 		)
 `
 
