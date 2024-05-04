@@ -59,7 +59,7 @@ func (s *catMatchSvc) List(c context.Context, userId string) ([]domain.CatMatchD
 func (s *catMatchSvc) Approve(c context.Context, matchId string, userId string) (id string, updatedAt time.Time, err error) {
 	id, updatedAt, err = s.mRepo.ApproveAndInvalidateOthers(c, matchId, userId)
 	if err == domain.ErrNotFound {
-		_, err = s.mRepo.GetReceivedByIdUserId(matchId, userId)
+		_, err = s.mRepo.GetReceivedByIdUserId(c, matchId, userId)
 		if err == domain.ErrNotFound {
 			return "", time.Time{}, domain.ErrNotFound
 		}
@@ -71,7 +71,7 @@ func (s *catMatchSvc) Approve(c context.Context, matchId string, userId string) 
 func (s *catMatchSvc) Reject(c context.Context, matchId string, userId string) (id string, updatedAt time.Time, err error) {
 	id, updatedAt, err = s.mRepo.Reject(c, matchId, userId)
 	if err == domain.ErrNotFound {
-		_, err = s.mRepo.GetReceivedByIdUserId(matchId, userId)
+		_, err = s.mRepo.GetReceivedByIdUserId(c, matchId, userId)
 		if err == domain.ErrNotFound {
 			return "", time.Time{}, domain.ErrNotFound
 		}
@@ -83,7 +83,7 @@ func (s *catMatchSvc) Reject(c context.Context, matchId string, userId string) (
 func (s *catMatchSvc) Delete(c context.Context, matchId string, userId string) (string, time.Time, error) {
 	matchId, deletedAt, err := s.mRepo.Delete(c, matchId, userId)
 	if err == domain.ErrNotFound {
-		_, err = s.mRepo.GetIssuedByIdUserId(matchId, userId)
+		_, err = s.mRepo.GetIssuedByIdUserId(c, matchId, userId)
 		if err == domain.ErrNotFound {
 			return "", time.Time{}, domain.ErrNotFound
 		}

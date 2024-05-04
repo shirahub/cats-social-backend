@@ -17,8 +17,8 @@ type CatRepository interface {
 type CatMatchRepository interface {
 	Create(context.Context, *domain.CatMatch) (*domain.CatMatch, error)
 	List(c context.Context, userId string) ([]domain.CatMatchDetail, error)
-	GetIssuedByIdUserId(matchId string, userId string) (*domain.CatMatch, error)
-	GetReceivedByIdUserId(matchId string, userId string) (*domain.CatMatch, error)
+	GetIssuedByIdUserId(c context.Context, matchId string, userId string) (*domain.CatMatch, error)
+	GetReceivedByIdUserId(c context.Context, matchId string, userId string) (*domain.CatMatch, error)
 	IsCatInAnyMatch(c context.Context, catId string) (bool, error)
 	AnyMatchExists(c context.Context, cat1Id, cat2Id string) (bool, error)
 	ApproveAndInvalidateOthers(c context.Context, matchId string, receiverUserId string) (id string, updatedAt time.Time, err error)

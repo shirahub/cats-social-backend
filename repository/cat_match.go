@@ -156,14 +156,14 @@ func (r *CatMatchRepo) List(c context.Context, userId string) ([]domain.CatMatch
 	return matches, err
 }
 
-func (r *CatMatchRepo) GetIssuedByIdUserId(matchId string, userId string) (*domain.CatMatch, error) {
+func (r *CatMatchRepo) GetIssuedByIdUserId(c context.Context, matchId string, userId string) (*domain.CatMatch, error) {
 	if !isValidId(matchId) || !isValidId(userId) {
 		return nil, domain.ErrNotFound
 	}
 
 	var match domain.CatMatch
-	err := r.db.QueryRow(
-		getIssuedByIdUserIdQuery,
+	err := r.db.QueryRowContext(
+		c, getIssuedByIdUserIdQuery,
 		matchId, userId,
 	).Scan(&match.Id, &match.Message, &match.IssuerCatId, &match.ReceiverCatId, &match.Status, &match.CreatedAt)
 	if err == sql.ErrNoRows {
@@ -172,14 +172,14 @@ func (r *CatMatchRepo) GetIssuedByIdUserId(matchId string, userId string) (*doma
 	return &match, err
 }
 
-func (r *CatMatchRepo) GetReceivedByIdUserId(matchId string, userId string) (*domain.CatMatch, error) {
+func (r *CatMatchRepo) GetReceivedByIdUserId(c context.Context, matchId string, userId string) (*domain.CatMatch, error) {
 	if !isValidId(matchId) || !isValidId(userId) {
 		return nil, domain.ErrNotFound
 	}
 
 	var match domain.CatMatch
-	err := r.db.QueryRow(
-		getReceivedByIdUserIdQuery,
+	err := r.db.QueryRowContext(
+		c, getReceivedByIdUserIdQuery,
 		matchId, userId,
 	).Scan(&match.Id, &match.Message, &match.IssuerCatId, &match.ReceiverCatId, &match.Status, &match.CreatedAt)
 	if err == sql.ErrNoRows {
