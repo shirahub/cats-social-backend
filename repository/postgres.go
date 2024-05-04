@@ -35,10 +35,7 @@ func NewPostgresConnection() *sql.DB {
 		panic("failed to open db")
 	}
 
-	dbLogLevel := sqldblogger.LevelError
-	if config.Config("LOG_DB_QUERIES") == "true" {
-		dbLogLevel = sqldblogger.LevelInfo
-	}
+	dbLogLevel := sqldblogger.LevelInfo
 	loggerAdapter := zerologadapter.New(zerolog.New(os.Stdout))
 	db = sqldblogger.OpenDriver(
 		address, db.Driver(), loggerAdapter, sqldblogger.WithMinimumLevel(dbLogLevel),
