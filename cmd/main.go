@@ -21,6 +21,7 @@ func main() {
 	// app.Use(cors.New())
 
 	dbConn := repository.NewPostgresConnection()
+	defer repository.CloseDbConn(dbConn)
 
 	userRepo := repository.NewUserRepo(dbConn)
 	catRepo := repository.NewCatRepo(dbConn)

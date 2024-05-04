@@ -47,3 +47,10 @@ func NewPostgresConnection() *sql.DB {
 
 	return db
 }
+
+func CloseDbConn(db *sql.DB) {
+	err := db.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
