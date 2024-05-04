@@ -21,11 +21,11 @@ func NewPostgresConnection() *sql.DB {
 		panic("failed to parse database port")
 	}
 
-	address := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s %s",
-		config.Config("DB_HOST"),
-		port,
+	address := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?%s",
 		config.Config("DB_USERNAME"),
 		config.Config("DB_PASSWORD"),
+		config.Config("DB_HOST"),
+		port,
 		config.Config("DB_NAME"),
 		config.Config("DB_PARAMS"),
 	)
