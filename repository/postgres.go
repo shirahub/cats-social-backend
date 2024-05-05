@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"time"
 	"github.com/rs/zerolog"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/simukti/sqldb-logger"
@@ -35,10 +34,6 @@ func NewPostgresConnection() *sql.DB {
 		log.Error(err.Error())
 		panic("failed to open db")
 	}
-
-	db.SetMaxOpenConns(5)
-	db.SetMaxIdleConns(3)
-	db.SetConnMaxLifetime(10 * time.Minute)
 
 	dbLogLevel := sqldblogger.LevelInfo
 	loggerAdapter := zerologadapter.New(zerolog.New(os.Stdout))
